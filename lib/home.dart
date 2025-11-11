@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'productpage.dart';
+// import 'grid.dart';
+import 'profile_page.dart';
 
 class HomePage extends StatefulWidget {
   final ThemeMode themeMode;
@@ -36,15 +38,10 @@ class _HomePageState extends State<HomePage> {
       ),
       const ProductPage(),
       const Center(child: Text("🛒 Cart Page....")),
-      const Center(child: Text("👤 Profile Page")),
+     ProfilePage(),
     ];
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Home — Theme Demo'),
-        centerTitle: true,
-        backgroundColor: theme.colorScheme.primaryContainer,
-      ),
       // body: ThemeToggle(widget: widget),
       body: pages[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
@@ -95,10 +92,8 @@ class HomeBody extends StatelessWidget{
       onThemeChanged:onThemeChanged),
       
       SizedBox(height: 30,),
-   const Text(
-          "🏠 Welcome to Home Page!",
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-        ),      ]
+
+     ]
       );
    }
    
@@ -140,6 +135,7 @@ class ThemeToggle extends StatelessWidget {
                 'Dark mode',
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
               ),
+              // ProductGrid(),
             ],
           ),
           const SizedBox(height: 20),

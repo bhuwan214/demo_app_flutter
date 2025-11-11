@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'home.dart';
 // import'buttonbar.dart';
+import './pages/contact_us.dart';
 
 void main() {
 	runApp(const MyApp());
@@ -38,6 +39,9 @@ class _MyAppState extends State<MyApp> {
 				useMaterial3: true,
 			),
 			themeMode: _themeMode,
+      routes:{
+        '/contact_us':(context)=> const ContactPage(),
+      },
     
 			home: HomePage(
 				themeMode: _themeMode,
