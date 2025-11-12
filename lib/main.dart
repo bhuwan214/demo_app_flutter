@@ -30,14 +30,14 @@ class _MyAppState extends State<MyApp> {
           ? ThemeData(
               brightness: Brightness.dark,
               colorScheme: ColorScheme.fromSeed(
-                seedColor: Colors.blue,
+                seedColor: const Color.fromARGB(255, 247, 165, 42),
                 brightness: Brightness.dark,
               ),
               useMaterial3: true,
             )
           : ThemeData(
               brightness: Brightness.light,
-              colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+              colorScheme: ColorScheme.fromSeed(seedColor: Colors.orange),
               useMaterial3: true,
             ),
       duration: const Duration(milliseconds: 500), // ← Animation duration

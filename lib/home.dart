@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'productpage.dart';
 import 'profile_page.dart';
 // import 'widget/themetoggle.dart';
+import 'widget/homebody.dart';
 
 class HomePage extends StatefulWidget {
   final ThemeMode themeMode;
@@ -32,10 +33,7 @@ class _HomePageState extends State<HomePage> {
     // final theme = Theme.of(context);
 
       final pages = [
-      HomeBody(
-        // themeMode: widget.themeMode,
-        // onThemeChanged: widget.onThemeChanged,
-      ),
+      const HomeBody(),
       const ProductPage(),
       const Center(child: Text("🛒 Cart Page....")),
      ProfilePage(
@@ -50,7 +48,7 @@ class _HomePageState extends State<HomePage> {
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
-        selectedItemColor: Colors.teal,
+        selectedItemColor: Colors.orange,
         unselectedItemColor: Colors.grey,
         type: BottomNavigationBarType.fixed,
         items: const [
@@ -75,27 +73,27 @@ class _HomePageState extends State<HomePage> {
 }
 
 
-class HomeBody extends StatelessWidget{
+// class HomeBody extends StatelessWidget{
    
-   const HomeBody({
-    super.key,
+//    const HomeBody({
+//     super.key,
  
-   });
+//    });
 
-   @override 
-   Widget build(BuildContext context){
-    return  ListView(
-      padding:const EdgeInsets.all(16),
-      children:[const SizedBox(height:10),
-      // ThemeToggle(themeMode:themeMode,
-      // onThemeChanged:onThemeChanged),
+//    @override 
+//    Widget build(BuildContext context){
+//     return  ListView(
+//       padding:const EdgeInsets.all(16),
+//       children:[const SizedBox(height:10),
+//       // ThemeToggle(themeMode:themeMode,
+//       // onThemeChanged:onThemeChanged),
       
-      SizedBox(height: 30,),
+//       SizedBox(height: 30,),
 
-     ]
-      );
-   }
+//      ]
+//       );
+//    }
    
-}
+// }
 
 

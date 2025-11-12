@@ -1,9 +1,17 @@
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class ProductGrid extends StatefulWidget {
-  const ProductGrid({super.key});
+  final String apiUrl;
+  final TextEditingController? searchController;
+
+  const ProductGrid({
+    super.key,
+    required this.apiUrl,
+    this.searchController,
+  });
 
   @override
   State<ProductGrid> createState() => _ProductGridState();
@@ -13,7 +21,6 @@ class _ProductGridState extends State<ProductGrid> with AutomaticKeepAliveClient
   List<dynamic> allItems = [];
   List<dynamic> filteredItems = [];
   bool isLoading = true;
-  final TextEditingController _searchController = TextEditingController();
 
   @override
   bool get wantKeepAlive => true;
@@ -22,17 +29,17 @@ class _ProductGridState extends State<ProductGrid> with AutomaticKeepAliveClient
   void initState() {
     super.initState();
     _fetchProducts();
-    _searchController.addListener(_filterProducts);
+    widget.searchController?.addListener(_filterProducts);
   }
 
   @override
   void dispose() {
-    _searchController.dispose();
+    widget.searchController?.removeListener(_filterProducts);
     super.dispose();
   }
 
   void _filterProducts() {
-    final query = _searchController.text.toLowerCase();
+    final query = widget.searchController?.text.toLowerCase() ?? '';
     setState(() {
       filteredItems = query.isEmpty
           ? allItems
@@ -45,9 +52,7 @@ class _ProductGridState extends State<ProductGrid> with AutomaticKeepAliveClient
 
   Future<void> _fetchProducts() async {
     try {
-      final response = await http.get(
-        Uri.parse("https://ecommerce.atithyahms.com/api/ecommerce/products/all"),
-      );
+      final response = await http.get(Uri.parse(widget.apiUrl));
 
       if (response.statusCode == 200 && mounted) {
         final data = json.decode(response.body);
@@ -75,61 +80,42 @@ class _ProductGridState extends State<ProductGrid> with AutomaticKeepAliveClient
       return const Center(child: CircularProgressIndicator());
     }
 
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(12.0),
-          child: TextField(
-            controller: _searchController,
-            decoration: InputDecoration(
-              hintText: 'Search products...',
-              prefixIcon: const Icon(Icons.search),
-              suffixIcon: _searchController.text.isNotEmpty
-                  ? IconButton(
-                      icon: const Icon(Icons.clear),
-                      onPressed: () => _searchController.clear(),
-                    )
-                  : null,
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-              filled: true,
-              fillColor: Colors.grey[100],
+    if (filteredItems.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.search_off, size: 60, color: Colors.grey),
+            const SizedBox(height: 16),
+            Text(
+              widget.searchController?.text.isEmpty ?? true
+                  ? 'No products'
+                  : 'No results',
             ),
-          ),
+          ],
         ),
-        Expanded(
-          child: filteredItems.isEmpty
-              ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(Icons.search_off, size: 60, color: Colors.grey),
-                      const SizedBox(height: 16),
-                      Text(_searchController.text.isEmpty ? 'No products' : 'No results'),
-                    ],
-                  ),
-                )
-              : Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                  child: GridView.builder(
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      crossAxisSpacing: 10,
-                      mainAxisSpacing: 10,
-                      childAspectRatio: .7,
-                    ),
-                    itemCount: filteredItems.length,
-                    itemBuilder: (context, index) {
-                      final item = filteredItems[index];
-                      return ItemCard(
-                        imageUrl: item['image']?.toString() ?? '',
-                        name: item['product_name']?.toString() ?? 'No Name',
-                        price: item['price']?.toString() ?? '0',
-                      );
-                    },
-                  ),
-                ),
+      );
+    }
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      child: GridView.builder(
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          crossAxisSpacing: 10,
+          mainAxisSpacing: 10,
+          childAspectRatio: .7,
         ),
-      ],
+        itemCount: filteredItems.length,
+        itemBuilder: (context, index) {
+          final item = filteredItems[index];
+          return ItemCard(
+            imageUrl: item['image']?.toString() ?? '',
+            name: item['product_name']?.toString() ?? 'No Name',
+            price: item['price']?.toString() ?? '0',
+          );
+        },
+      ),
     );
   }
 }
