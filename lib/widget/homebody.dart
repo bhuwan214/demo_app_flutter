@@ -2,9 +2,25 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../grid.dart';
+import '../productpage.dart';
+import 'package:demo_app/widget/search_field.dart';
 
-class HomeBody extends StatelessWidget {
+class HomeBody extends StatefulWidget {
   const HomeBody({super.key});
+
+  @override
+  State<HomeBody> createState() => _HomeBodyState();
+}
+
+class _HomeBodyState extends State<HomeBody> {
+    final TextEditingController _searchController = TextEditingController();
+
+    @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -12,15 +28,12 @@ class HomeBody extends StatelessWidget {
     final colorScheme = theme.colorScheme;
     final isDark = theme.brightness == Brightness.dark;
 
-    return Scaffold(
-      backgroundColor: colorScheme.surface,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
                 // Header with profile
                 Row(
                   children: [
@@ -52,103 +65,48 @@ class HomeBody extends StatelessWidget {
                     ),
                     const Spacer(),
                     IconButton(
-                      icon: Icon(
-                        Icons.notifications_outlined,
-                        color: colorScheme.onSurface,
-                      ),
+                      icon: Icon(Icons.notifications_outlined, color: colorScheme.onSurface),
                       onPressed: () {},
                     ),
                     IconButton(
-                      icon: Icon(
-                        Icons.shopping_bag_outlined,
-                        color: colorScheme.onSurface,
-                      ),
+                      icon: Icon(Icons.shopping_bag_outlined, color: colorScheme.onSurface),
                       onPressed: () {},
                     ),
                   ],
                 ),
-                const SizedBox(height: 20),
+                // const SizedBox(height: 10),
 
-                // Search Bar
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  decoration: BoxDecoration(
-                    color: isDark
-                        ? colorScheme.surfaceContainerHighest
-                        : colorScheme.surfaceContainerHigh,
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.search,
-                        color: colorScheme.onSurface.withOpacity(0.6),
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: TextField(
-                          style: TextStyle(color: colorScheme.onSurface),
-                          decoration: InputDecoration(
-                            hintText: 'Search',
-                            hintStyle: TextStyle(
-                              color: colorScheme.onSurface.withValues(),
-                            ),
-                            border: InputBorder.none,
-                          ),
-                        ),
-                      ),
-                      IconButton(
-                        icon: Icon(
-                          Icons.tune,
-                          color: colorScheme.onSurface.withValues(),
-                        ),
-                        onPressed: () {},
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 24),
+                   SearchTextField(
+            controller: _searchController,
+            hintText: 'Search products...',
+            onChanged: (value) {
+                            setState(() {});
+            },
+            onClear: () {
 
-                // Categories Section
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Categories',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: colorScheme.onSurface,
-                      ),
-                    ),
-                    TextButton(
-                      onPressed: () {},
-                      child: Text(
-                        'See All',
-                        style: TextStyle(color: colorScheme.primary),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
+             setState(() {});
+            },
+          ),
+
+            
 
                 // Category Chips
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: [
-                      _CategoryChip(label: 'All', isSelected: true),
-                      _CategoryChip(label: 'Men', isSelected: false),
-                      _CategoryChip(label: 'Women', isSelected: false),
-                      _CategoryChip(label: 'Girls', isSelected: false),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 20),
+                // SingleChildScrollView(
+                //   scrollDirection: Axis.horizontal,
+                //   child: Row(
+                //     children: [
+                //       _CategoryChip(label: 'All', isSelected: true),
+                //       _CategoryChip(label: 'Men', isSelected: false),
+                //       _CategoryChip(label: 'Women', isSelected: false),
+                //       _CategoryChip(label: 'Girls', isSelected: false),
+                //     ],
+                //   ),
+                // ),
+                // const SizedBox(height: 20),
 
                 // Promotional Banner
                 Container(
-                  height: 180,
+                  height: 150,
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: isDark
@@ -160,7 +118,7 @@ class HomeBody extends StatelessWidget {
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Padding(
-                    padding: const EdgeInsets.all(24.0),
+                    padding: const EdgeInsets.fromLTRB(25, 12, 25, 10),
                     child: Row(
                       children: [
                         Expanded(
@@ -171,10 +129,8 @@ class HomeBody extends StatelessWidget {
                               Text(
                                 'Get Your\nSpecial Sale\nUp to 40%',
                                 style: TextStyle(
-                                  color: isDark
-                                      ? colorScheme.onPrimaryContainer
-                                      : Colors.white,
-                                  fontSize: 24,
+                                  color: isDark ? colorScheme.onPrimaryContainer : Colors.white,
+                                  fontSize: 20,
                                   fontWeight: FontWeight.bold,
                                   height: 1.2,
                                 ),
@@ -183,21 +139,12 @@ class HomeBody extends StatelessWidget {
                               ElevatedButton(
                                 onPressed: () {},
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: isDark
-                                      ? colorScheme.surface
-                                      : Colors.white,
-                                  foregroundColor: isDark
-                                      ? colorScheme.primary
-                                      : const Color(0xFFFF6B3D),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 18,
-                                    vertical: 12,
-                                  ),
+                                  backgroundColor: isDark ? colorScheme.surface : Colors.white,
+                                  foregroundColor: isDark ? colorScheme.primary : const Color(0xFFFF6B3D),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 1),
                                 ),
-                                child: const Text('Shop Now'),
+                                child: const Text('Shop Now' ,style: TextStyle(fontSize:12),),
                               ),
                             ],
                           ),
@@ -213,36 +160,13 @@ class HomeBody extends StatelessWidget {
                     ),
                   ),
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 14),
 
-                // Popular Products Section
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Popular Product',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: colorScheme.onSurface,
-                      ),
-                    ),
-                    TextButton(
-                      onPressed: () {},
-                      child: Text(
-                        'See All',
-                        style: TextStyle(color: colorScheme.primary),
-                      ),
-                    ),
-                  ],
-                ),
-                PopularProduct(),
+                const PopularProduct(),
               ],
             ),
           ),
-        ),
-      ),
-    );
+        );
   }
 }
 
@@ -263,9 +187,7 @@ class _CategoryChip extends StatelessWidget {
         label: Text(label),
         selected: isSelected,
         onSelected: (bool value) {},
-        backgroundColor: isDark
-            ? colorScheme.surfaceContainerHighest
-            : colorScheme.surfaceContainerHigh,
+        backgroundColor: isDark ? colorScheme.surfaceContainerHighest : colorScheme.surfaceContainerHigh,
         selectedColor: colorScheme.primary,
         labelStyle: TextStyle(
           color: isSelected ? colorScheme.onPrimary : colorScheme.onSurface,
@@ -277,38 +199,106 @@ class _CategoryChip extends StatelessWidget {
   }
 }
 
-
-class PopularProduct extends StatelessWidget{
+class PopularProduct extends StatefulWidget {
   const PopularProduct({super.key});
 
   @override
+  State<PopularProduct> createState() => _PopularProductState();
+}
+
+class _PopularProductState extends State<PopularProduct> {
+  bool showAll = false;
+  List<dynamic> items = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchPopular();
+  }
+
+  Future<void> _fetchPopular() async {
+    try {
+      final resp = await http.get(
+        Uri.parse('https://ecommerce.atithyahms.com/api/ecommerce/products/popular'),
+      );
+      if (resp.statusCode == 200 && mounted) {
+        final data = json.decode(resp.body);
+        if (data['success'] == true && data['data'] != null) {
+          setState(() {
+            items = data['data'];
+            isLoading = false;
+          });
+        }
+      }
+    } catch (e) {
+      if (mounted) setState(() => isLoading = false);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    // Show exactly 4 popular products by fetching data and displaying first 4
-    return FutureBuilder(
-      future: _fetchPopular(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        }
-        if (snapshot.hasError) {
-          return const Center(child: Text('Failed to load popular products'));
-        }
-  final items = snapshot.data ?? <dynamic>[];
-        final display = items.length > 4 ? items.sublist(0, 4) : items;
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12),
-          child: GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
+    final colorScheme = Theme.of(context).colorScheme;
+    
+    final displayItems = showAll ? items : (items.length > 4 ? items.sublist(0, 4) : items);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Popular Product',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: colorScheme.onSurface,
+              ),
+            ),
+            if (items.length > 4)
+              TextButton(
+                onPressed: () {
+                  setState(() {
+                    showAll = !showAll; // Toggle to show all items or just 4
+                  });
+                },
+                child: Text(
+                  showAll ? 'Show Less' : 'See All',
+                  style: TextStyle(color: colorScheme.primary),
+                ),
+              ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        if (isLoading)
+          const Center(
+            child: Padding(
+              padding: EdgeInsets.all(40),
+              child: CircularProgressIndicator(),
+            ),
+          )
+        else if (displayItems.isEmpty)
+          const Center(
+            child: Padding(
+              padding: EdgeInsets.all(20),
+              child: Text('No popular products'),
+            ),
+          )
+        else
+       
+          GridView.builder(
+            shrinkWrap: true, 
+            physics: const NeverScrollableScrollPhysics(), 
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
               crossAxisSpacing: 10,
               mainAxisSpacing: 10,
               childAspectRatio: .7,
             ),
-            itemCount: display.length,
+            itemCount: displayItems.length, 
             itemBuilder: (context, index) {
-              final item = display[index];
+              final item = displayItems[index];
               return ItemCard(
                 imageUrl: item['image']?.toString() ?? '',
                 name: item['product_name']?.toString() ?? 'No Name',
@@ -316,22 +306,7 @@ class PopularProduct extends StatelessWidget{
               );
             },
           ),
-        );
-      },
+      ],
     );
-  }
-
-  Future<List<dynamic>> _fetchPopular() async {
-    try {
-      final uri = Uri.parse('https://ecommerce.atithyahms.com/api/ecommerce/products/popular');
-      final resp = await http.get(uri);
-      if (resp.statusCode == 200) {
-        final data = json.decode(resp.body);
-        if (data['success'] == true && data['data'] != null) {
-          return List<dynamic>.from(data['data']);
-        }
-      }
-    } catch (_) {}
-    return [];
   }
 }

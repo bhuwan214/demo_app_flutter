@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'grid.dart';
+import 'package:demo_app/grid.dart';
+import 'package:demo_app/widget/search_field.dart';
 
 class ProductPage extends StatefulWidget {
   const ProductPage({super.key});
@@ -29,39 +30,23 @@ class _ProductPageState extends State<ProductPage> {
       ),
       body: Column(
         children: [
-          // Search Bar
-          Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: TextField(
-              controller: _searchController,
-              decoration: InputDecoration(
-                hintText: 'Search products...',
-                prefixIcon: const Icon(Icons.search),
-                suffixIcon: ValueListenableBuilder(
-                  valueListenable: _searchController,
-                  builder: (context, value, child) {
-                    return value.text.isNotEmpty
-                        ? IconButton(
-                            icon: const Icon(Icons.clear),
-                            onPressed: () => _searchController.clear(),
-                          )
-                        : const SizedBox.shrink();
-                  },
-                ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                filled: true,
-                fillColor: Colors.grey[100],
-              ),
-            ),
+          // Reusable Search Widget
+          SearchTextField(
+            controller: _searchController,
+            hintText: 'Search products...',
+            onChanged: (value) {
+              
+              setState(() {});
+            },
+            onClear: () {
+              setState(() {});
+            },
           ),
           // Product Grid
           Expanded(
             child: ProductGrid(
               apiUrl: "https://ecommerce.atithyahms.com/api/ecommerce/products/all",
               searchController: _searchController,
-              
             ),
           ),
         ],

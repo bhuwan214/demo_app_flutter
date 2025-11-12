@@ -2,6 +2,8 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:demo_app/pages/detail_page.dart';
+
 
 class ProductGrid extends StatefulWidget {
   final String apiUrl;
@@ -115,6 +117,7 @@ class _ProductGridState extends State<ProductGrid> with AutomaticKeepAliveClient
             imageUrl: item['image']?.toString() ?? '',
             name: item['product_name']?.toString() ?? 'No Name',
             price: item['price']?.toString() ?? '0',
+          
           );
         },
       ),
@@ -146,15 +149,27 @@ class ItemCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    imageUrl;
+    name;
+    price;
+
     return Card(
       elevation: 5,
       margin: const EdgeInsets.all(5),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: InkWell(
         onTap: () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Clicked on $name')),
-          );
+
+          Navigator.push(context,
+          MaterialPageRoute(builder: (_)=>DetailsPage(
+            imageUrl: imageUrl,
+            name: name,
+            price: price,
+          )));
+          // ScaffoldMessenger.of(context).showSnackBar(
+
+          // SnackBar(content: Text('Clicked on $name')),
+          // );
         },
         borderRadius: BorderRadius.circular(12),
         child: Padding(
