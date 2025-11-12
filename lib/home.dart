@@ -29,12 +29,12 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
 
-    final theme = Theme.of(context);
+    // final theme = Theme.of(context);
 
       final pages = [
       HomeBody(
-        themeMode: widget.themeMode,
-        onThemeChanged: widget.onThemeChanged,
+        // themeMode: widget.themeMode,
+        // onThemeChanged: widget.onThemeChanged,
       ),
       const ProductPage(),
       const Center(child: Text("🛒 Cart Page....")),
@@ -77,13 +77,9 @@ class _HomePageState extends State<HomePage> {
 
 class HomeBody extends StatelessWidget{
    
-   final ThemeMode themeMode;
-   final ValueChanged<ThemeMode> onThemeChanged;
-
    const HomeBody({
     super.key,
-    required this.themeMode,
-    required this.onThemeChanged,
+ 
    });
 
    @override 
@@ -91,8 +87,8 @@ class HomeBody extends StatelessWidget{
     return  ListView(
       padding:const EdgeInsets.all(16),
       children:[const SizedBox(height:10),
-      ThemeToggle(themeMode:themeMode,
-      onThemeChanged:onThemeChanged),
+      // ThemeToggle(themeMode:themeMode,
+      // onThemeChanged:onThemeChanged),
       
       SizedBox(height: 30,),
 
@@ -103,47 +99,3 @@ class HomeBody extends StatelessWidget{
 }
 
 
-
-
-class ThemeToggle extends StatelessWidget {
-  final ThemeMode themeMode;
-  final ValueChanged<ThemeMode> onThemeChanged;
-
-  const ThemeToggle({super.key, required this.themeMode, required this.onThemeChanged,});
-
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SizedBox(height: 20),
-          Row(
-            children: [
-              const Text(
-                "Light mode",
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
-              ),
-              const SizedBox(width: 8),
-              Switch.adaptive(
-                value: themeMode == ThemeMode.dark,
-
-                onChanged: (v) =>
-                    onThemeChanged(v ? ThemeMode.dark : ThemeMode.light),
-              ),
-              const SizedBox(width: 8),
-              Text(
-                'Dark mode',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
-              ),
-              // ProductGrid(),
-            ],
-          ),
-          const SizedBox(height: 20),
-        ],
-      ),
-    );
-  }
-}
