@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'productpage.dart';
 import 'profile_page.dart';
-// import 'widget/themetoggle.dart';
 import 'widget/homebody.dart';
 
 class HomePage extends StatefulWidget {
@@ -29,17 +28,16 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-
     // final theme = Theme.of(context);
 
-      final pages = [
+    final pages = [
       const HomeBody(),
       const ProductPage(),
       const Center(child: Text("🛒 Cart Page....")),
-     ProfilePage(
-         themeMode: widget.themeMode,
+      ProfilePage(
+        themeMode: widget.themeMode,
         onThemeChanged: widget.onThemeChanged,
-     ),
+      ),
     ];
 
     return Scaffold(
@@ -52,9 +50,7 @@ class _HomePageState extends State<HomePage> {
         unselectedItemColor: Colors.grey,
         type: BottomNavigationBarType.fixed,
         items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home), 
-            label: "Home"),
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
           BottomNavigationBarItem(
             icon: Icon(Icons.shopping_bag),
             label: "Products",
@@ -63,37 +59,9 @@ class _HomePageState extends State<HomePage> {
             icon: Icon(Icons.shopping_cart),
             label: "Cart",
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person), 
-            label: "Profile"),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
         ],
       ),
     );
   }
 }
-
-
-// class HomeBody extends StatelessWidget{
-   
-//    const HomeBody({
-//     super.key,
- 
-//    });
-
-//    @override 
-//    Widget build(BuildContext context){
-//     return  ListView(
-//       padding:const EdgeInsets.all(16),
-//       children:[const SizedBox(height:10),
-//       // ThemeToggle(themeMode:themeMode,
-//       // onThemeChanged:onThemeChanged),
-      
-//       SizedBox(height: 30,),
-
-//      ]
-//       );
-//    }
-   
-// }
-
-

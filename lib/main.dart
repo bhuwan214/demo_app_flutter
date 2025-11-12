@@ -26,20 +26,36 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return AnimatedTheme(
-      data: _themeMode == ThemeMode.dark
-          ? ThemeData(
-              brightness: Brightness.dark,
-              colorScheme: ColorScheme.fromSeed(
-                seedColor: const Color.fromARGB(255, 247, 165, 42),
-                brightness: Brightness.dark,
-              ),
-              useMaterial3: true,
-            )
-          : ThemeData(
-              brightness: Brightness.light,
-              colorScheme: ColorScheme.fromSeed(seedColor: Colors.orange),
-              useMaterial3: true,
-            ),
+    data: _themeMode == ThemeMode.dark
+    ? ThemeData(
+        brightness: Brightness.dark,
+        colorScheme: const ColorScheme.dark(
+          primary: Colors.orange,
+          secondary: Colors.deepOrangeAccent,
+          surface: Color(0xFF1E1E1E),
+          background: Color(0xFF121212),
+          onPrimary: Colors.white,
+          onSecondary: Colors.white,
+          onSurface: Colors.white70,
+          onBackground: Colors.white70,
+        ),
+        useMaterial3: true,
+      )
+    : ThemeData(
+        brightness: Brightness.light,
+        colorScheme: const ColorScheme.light(
+          primary: Colors.orange,
+          secondary: Colors.deepOrangeAccent,
+          surface: Colors.white,
+          background: Color(0xFFF7F7F7),
+          onPrimary: Colors.white,
+          onSecondary: Colors.white,
+          onSurface: Colors.black87,
+          onBackground: Colors.black87,
+        ),
+        useMaterial3: true,
+      ),
+
       duration: const Duration(milliseconds: 500), // ← Animation duration
       curve: Curves.easeInOut, // ← Animation curve
       child: Builder(

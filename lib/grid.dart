@@ -99,7 +99,9 @@ class _ProductGridState extends State<ProductGrid> with AutomaticKeepAliveClient
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12),
-      child: GridView.builder(
+      child: ScrollConfiguration(
+        behavior: const NoScrollbarBehavior(),
+        child: GridView.builder(
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
           crossAxisSpacing: 10,
@@ -116,7 +118,17 @@ class _ProductGridState extends State<ProductGrid> with AutomaticKeepAliveClient
           );
         },
       ),
+      ),
     );
+  }
+}
+
+class NoScrollbarBehavior extends ScrollBehavior {
+  const NoScrollbarBehavior();
+
+  @override
+  Widget buildScrollbar(BuildContext context, Widget child, ScrollableDetails details) {
+    return child; // don't build a scrollbar
   }
 }
 

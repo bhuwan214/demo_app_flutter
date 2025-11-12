@@ -61,6 +61,7 @@ class _ProductPageState extends State<ProductPage> {
             child: ProductGrid(
               apiUrl: "https://ecommerce.atithyahms.com/api/ecommerce/products/all",
               searchController: _searchController,
+              
             ),
           ),
         ],

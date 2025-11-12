@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import '../grid.dart';
 
 class HomeBody extends StatelessWidget {
   const HomeBody({super.key});
@@ -88,7 +91,7 @@ class HomeBody extends StatelessWidget {
                           decoration: InputDecoration(
                             hintText: 'Search',
                             hintStyle: TextStyle(
-                              color: colorScheme.onSurface.withOpacity(0.5),
+                              color: colorScheme.onSurface.withValues(),
                             ),
                             border: InputBorder.none,
                           ),
@@ -97,7 +100,7 @@ class HomeBody extends StatelessWidget {
                       IconButton(
                         icon: Icon(
                           Icons.tune,
-                          color: colorScheme.onSurface.withOpacity(0.6),
+                          color: colorScheme.onSurface.withValues(),
                         ),
                         onPressed: () {},
                       ),
@@ -149,14 +152,8 @@ class HomeBody extends StatelessWidget {
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: isDark
-                          ? [
-                              colorScheme.primaryContainer,
-                              colorScheme.primary,
-                            ]
-                          : [
-                              const Color(0xFFFF8A5B),
-                              const Color(0xFFFF6B3D),
-                            ],
+                          ? [colorScheme.primaryContainer, colorScheme.primary]
+                          : [const Color(0xFFFF8A5B), const Color(0xFFFF6B3D)],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
@@ -239,6 +236,7 @@ class HomeBody extends StatelessWidget {
                     ),
                   ],
                 ),
+                PopularProduct(),
               ],
             ),
           ),
@@ -252,10 +250,7 @@ class _CategoryChip extends StatelessWidget {
   final String label;
   final bool isSelected;
 
-  const _CategoryChip({
-    required this.label,
-    required this.isSelected,
-  });
+  const _CategoryChip({required this.label, required this.isSelected});
 
   @override
   Widget build(BuildContext context) {
@@ -273,13 +268,70 @@ class _CategoryChip extends StatelessWidget {
             : colorScheme.surfaceContainerHigh,
         selectedColor: colorScheme.primary,
         labelStyle: TextStyle(
-          color: isSelected
-              ? colorScheme.onPrimary
-              : colorScheme.onSurface,
+          color: isSelected ? colorScheme.onPrimary : colorScheme.onSurface,
           fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
         ),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       ),
     );
+  }
+}
+
+
+class PopularProduct extends StatelessWidget{
+  const PopularProduct({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    // Show exactly 4 popular products by fetching data and displaying first 4
+    return FutureBuilder(
+      future: _fetchPopular(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        if (snapshot.hasError) {
+          return const Center(child: Text('Failed to load popular products'));
+        }
+  final items = snapshot.data ?? <dynamic>[];
+        final display = items.length > 4 ? items.sublist(0, 4) : items;
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          child: GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 10,
+              mainAxisSpacing: 10,
+              childAspectRatio: .7,
+            ),
+            itemCount: display.length,
+            itemBuilder: (context, index) {
+              final item = display[index];
+              return ItemCard(
+                imageUrl: item['image']?.toString() ?? '',
+                name: item['product_name']?.toString() ?? 'No Name',
+                price: item['price']?.toString() ?? '0',
+              );
+            },
+          ),
+        );
+      },
+    );
+  }
+
+  Future<List<dynamic>> _fetchPopular() async {
+    try {
+      final uri = Uri.parse('https://ecommerce.atithyahms.com/api/ecommerce/products/popular');
+      final resp = await http.get(uri);
+      if (resp.statusCode == 200) {
+        final data = json.decode(resp.body);
+        if (data['success'] == true && data['data'] != null) {
+          return List<dynamic>.from(data['data']);
+        }
+      }
+    } catch (_) {}
+    return [];
   }
 }
