@@ -9,187 +9,127 @@ class ProductGrid extends StatefulWidget {
   State<ProductGrid> createState() => _ProductGridState();
 }
 
-class _ProductGridState extends State<ProductGrid> {
-  List<dynamic> items = [];
+class _ProductGridState extends State<ProductGrid> with AutomaticKeepAliveClientMixin {
+  List<dynamic> allItems = [];
+  List<dynamic> filteredItems = [];
   bool isLoading = true;
-  String? errorMessage;
+  final TextEditingController _searchController = TextEditingController();
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {
     super.initState();
-    fetchProducts();
+    _fetchProducts();
+    _searchController.addListener(_filterProducts);
   }
 
   @override
   void dispose() {
-    // Widget is being disposed, no more setState calls
+    _searchController.dispose();
     super.dispose();
   }
 
-  Future<void> fetchProducts() async {
-    // Check if widget is still mounted before starting
-    if (!mounted) return;
-
+  void _filterProducts() {
+    final query = _searchController.text.toLowerCase();
     setState(() {
-      isLoading = true;
-      errorMessage = null;
+      filteredItems = query.isEmpty
+          ? allItems
+          : allItems.where((item) {
+              final name = item['product_name']?.toString().toLowerCase() ?? '';
+              return name.contains(query);
+            }).toList();
     });
+  }
 
+  Future<void> _fetchProducts() async {
     try {
       final response = await http.get(
-        Uri.parse(
-          "https://ecommerce.atithyahms.com/api/ecommerce/products/all",
-        ),
-      ).timeout(
-        const Duration(seconds: 10),
-        onTimeout: () {
-          throw Exception('Connection timeout. Please check your internet.');
-        },
+        Uri.parse("https://ecommerce.atithyahms.com/api/ecommerce/products/all"),
       );
 
-      // CRITICAL: Check if widget is still mounted before setState
-      if (!mounted) return;
-
-      if (response.statusCode == 200) {
+      if (response.statusCode == 200 && mounted) {
         final data = json.decode(response.body);
-
-        if (data is Map && data['success'] == true && data['data'] != null) {
-          if (!mounted) return; // Check again before setState
+        if (data['success'] == true && data['data'] != null) {
           setState(() {
-            items = data['data'] is List ? data['data'] : [];
+            allItems = data['data'];
+            filteredItems = allItems;
             isLoading = false;
-          });
-        } else {
-          if (!mounted) return;
-          setState(() {
-            items = [];
-            isLoading = false;
-            errorMessage = 'No products found';
           });
         }
-      } else {
-        throw Exception('Server error: ${response.statusCode}');
       }
     } catch (e) {
-      if (!mounted) return; // Check before setState
-      setState(() {
-        isLoading = false;
-        errorMessage = e.toString();
-      });
-      debugPrint("Error fetching products: $e");
+      if (mounted) {
+        setState(() => isLoading = false);
+      }
+      debugPrint("Error: $e");
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
+
     if (isLoading) {
-      return const Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            CircularProgressIndicator(),
-            SizedBox(height: 16),
-            Text('Loading products...'),
-          ],
-        ),
-      );
+      return const Center(child: CircularProgressIndicator());
     }
 
-    if (errorMessage != null) {
-      return Center(
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.error_outline, size: 60, color: Colors.red),
-              const SizedBox(height: 16),
-              Text(
-                'Error loading products',
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                errorMessage!,
-                textAlign: TextAlign.center,
-                style: const TextStyle(color: Colors.grey),
-              ),
-              const SizedBox(height: 16),
-              ElevatedButton.icon(
-                onPressed: fetchProducts,
-                icon: const Icon(Icons.refresh),
-                label: const Text('Retry'),
-              ),
-            ],
-          ),
-        ),
-      );
-    }
-
-    if (items.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.shopping_bag_outlined, size: 60, color: Colors.grey),
-            const SizedBox(height: 16),
-            const Text('No products available'),
-            const SizedBox(height: 16),
-            TextButton.icon(
-              onPressed: fetchProducts,
-              icon: const Icon(Icons.refresh),
-              label: const Text('Refresh'),
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: TextField(
+            controller: _searchController,
+            decoration: InputDecoration(
+              hintText: 'Search products...',
+              prefixIcon: const Icon(Icons.search),
+              suffixIcon: _searchController.text.isNotEmpty
+                  ? IconButton(
+                      icon: const Icon(Icons.clear),
+                      onPressed: () => _searchController.clear(),
+                    )
+                  : null,
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+              filled: true,
+              fillColor: Colors.grey[100],
             ),
-          ],
-        ),
-      );
-    }
-
-    return RefreshIndicator(
-      onRefresh: fetchProducts,
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: GridView.builder(
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            crossAxisSpacing: 10,
-            mainAxisSpacing: 10,
-            childAspectRatio: .7,
           ),
-          itemCount: items.length,
-          itemBuilder: (context, index) {
-            try {
-              final item = items[index];
-
-              if (item == null || item is! Map) {
-                return const Card(
-                  child: Center(child: Text('Invalid product data')),
-                );
-              }
-
-              return ItemCard(
-                imageUrl: item['image']?.toString() ?? '',
-                name: item['product_name']?.toString() ?? 'No Name',
-                price: item['price']?.toString() ?? '0',
-              );
-            } catch (e) {
-              debugPrint('Error building item at index $index: $e');
-              return const Card(
-                child: Center(
+        ),
+        Expanded(
+          child: filteredItems.isEmpty
+              ? Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.error, color: Colors.red),
-                      SizedBox(height: 8),
-                      Text('Error loading item', style: TextStyle(fontSize: 12)),
+                      const Icon(Icons.search_off, size: 60, color: Colors.grey),
+                      const SizedBox(height: 16),
+                      Text(_searchController.text.isEmpty ? 'No products' : 'No results'),
                     ],
                   ),
+                )
+              : Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  child: GridView.builder(
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      crossAxisSpacing: 10,
+                      mainAxisSpacing: 10,
+                      childAspectRatio: .7,
+                    ),
+                    itemCount: filteredItems.length,
+                    itemBuilder: (context, index) {
+                      final item = filteredItems[index];
+                      return ItemCard(
+                        imageUrl: item['image']?.toString() ?? '',
+                        name: item['product_name']?.toString() ?? 'No Name',
+                        price: item['price']?.toString() ?? '0',
+                      );
+                    },
+                  ),
                 ),
-              );
-            }
-          },
         ),
-      ),
+      ],
     );
   }
 }
@@ -222,7 +162,6 @@ class ItemCard extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(12.0),
           child: Column(
-            mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Expanded(
@@ -236,38 +175,13 @@ class ItemCard extends StatelessWidget {
                           errorBuilder: (context, error, stackTrace) {
                             return Container(
                               color: Colors.grey[200],
-                              child: const Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(Icons.broken_image, size: 40, color: Colors.grey),
-                                  SizedBox(height: 4),
-                                  Text(
-                                    'Image unavailable',
-                                    style: TextStyle(fontSize: 10, color: Colors.grey),
-                                  ),
-                                ],
-                              ),
-                            );
-                          },
-                          loadingBuilder: (context, child, loadingProgress) {
-                            if (loadingProgress == null) return child;
-                            return Center(
-                              child: CircularProgressIndicator(
-                                value: loadingProgress.expectedTotalBytes != null
-                                    ? loadingProgress.cumulativeBytesLoaded /
-                                        loadingProgress.expectedTotalBytes!
-                                    : null,
-                              ),
+                              child: const Icon(Icons.broken_image, color: Colors.grey),
                             );
                           },
                         )
                       : Container(
                           color: Colors.grey[200],
-                          child: const Icon(
-                            Icons.image_not_supported,
-                            size: 40,
-                            color: Colors.grey,
-                          ),
+                          child: const Icon(Icons.image_not_supported, color: Colors.grey),
                         ),
                 ),
               ),
