@@ -1,9 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
+import 'widget/themetoggle.dart';
 
 class ProfilePage extends StatefulWidget {
-  const ProfilePage({super.key});
+  final ThemeMode themeMode;
+  final ValueChanged<ThemeMode> onThemeChanged;
+
+  const ProfilePage({
+    super.key,
+    required this.themeMode,
+    required this.onThemeChanged,
+  });
 
   @override
   State<ProfilePage> createState() => _ProfilePageState();
@@ -14,12 +22,6 @@ class _ProfilePageState extends State<ProfilePage> {
   String name = "Bhuwan Kathayat";
   String email = "bhuwan@example.com";
   String location = "Kathmandu, Nepal";
-
-  final List<Map<String, String>> orderHistory = [
-    {"orderId": "#1001", "item": "OKF Smoothie 350ML", "date": "Nov 10, 2025"},
-    {"orderId": "#1002", "item": "Veggie Noodles 112g", "date": "Nov 08, 2025"},
-    {"orderId": "#1003", "item": "Premium Coffee Beans 250g", "date": "Nov 02, 2025"},
-  ];
 
   Future<void> _pickProfileImage() async {
     final ImagePicker picker = ImagePicker();
@@ -84,6 +86,8 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDarkMode = widget.themeMode == ThemeMode.dark;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("Profile Page"),
@@ -149,35 +153,45 @@ class _ProfilePageState extends State<ProfilePage> {
 
           const SizedBox(height: 20),
           const Divider(),
+          const SizedBox(height: 10),
+
+          // Theme Toggle as ListTile
+          ListTile(
+            leading: Icon(
+              isDarkMode ? Icons.dark_mode : Icons.light_mode,
+            ),
+            title: const Text("Theme"),
+            subtitle: Text(isDarkMode ? "Dark Mode" : "Light Mode"),
+            trailing: Switch.adaptive(
+              value: isDarkMode,
+              onChanged: (value) {
+                widget.onThemeChanged(value ? ThemeMode.dark : ThemeMode.light);
+              },
+            ),
+          ),
+
+          const Divider(),
+          const SizedBox(height: 10),
 
           // Order History Section
-          Text("Order History", style: theme.textTheme.titleMedium),
-          const SizedBox(height: 10),
-          ...orderHistory.map((order) => Card(
-                child: ListTile(
-                  leading: const Icon(Icons.shopping_bag_outlined),
-                  title: Text(order['item']!),
-                  subtitle: Text(order['date']!),
-                  trailing: Text(order['orderId']!),
-                ),
-              )),
+          ListTile(
+            leading: const Icon(Icons.history_outlined),
+            title: const Text("Order History"),
+            onTap: () {},
+          ),
 
-          const SizedBox(height: 20),
-          const Divider(),
-
-          // Settings Section
-          Text("Settings", style: theme.textTheme.titleMedium),
-          const SizedBox(height: 10),
           ListTile(
             leading: const Icon(Icons.lock_outline),
             title: const Text("Change Password"),
             onTap: () {},
           ),
+
           ListTile(
             leading: const Icon(Icons.settings_outlined),
             title: const Text("Settings"),
             onTap: () {},
           ),
+
           ListTile(
             leading: const Icon(Icons.support_agent),
             title: const Text("Contact Us"),
@@ -185,6 +199,7 @@ class _ProfilePageState extends State<ProfilePage> {
               Navigator.pushNamed(context, '/contact_us');
             },
           ),
+
           ListTile(
             leading: const Icon(Icons.add_location_alt_sharp),
             title: const Text("Location"),
@@ -192,9 +207,13 @@ class _ProfilePageState extends State<ProfilePage> {
               Navigator.pushNamed(context, '/location');
             },
           ),
+
+          const Divider(),
+          const SizedBox(height: 10),
+
           ListTile(
-            leading: const Icon(Icons.logout),
-            title: const Text("Logout"),
+            leading: const Icon(Icons.logout, color: Colors.red),
+            title: const Text("Logout", style: TextStyle(color: Colors.red)),
             onTap: () {
               // Show confirmation dialog
               showDialog(
@@ -215,6 +234,9 @@ class _ProfilePageState extends State<ProfilePage> {
                           const SnackBar(content: Text('Logged out successfully')),
                         );
                       },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
+                      ),
                       child: const Text('Logout'),
                     ),
                   ],

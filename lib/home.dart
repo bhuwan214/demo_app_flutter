@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'productpage.dart';
-// import 'grid.dart';
 import 'profile_page.dart';
+// import 'widget/themetoggle.dart';
 
 class HomePage extends StatefulWidget {
   final ThemeMode themeMode;
@@ -38,7 +38,10 @@ class _HomePageState extends State<HomePage> {
       ),
       const ProductPage(),
       const Center(child: Text("🛒 Cart Page....")),
-     ProfilePage(),
+     ProfilePage(
+         themeMode: widget.themeMode,
+        onThemeChanged: widget.onThemeChanged,
+     ),
     ];
 
     return Scaffold(
