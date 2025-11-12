@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -37,6 +38,9 @@ class _ProfilePageState extends State<ProfilePage> {
     final result = await showDialog<Map<String, String>>(
       context: context,
       builder: (context) {
+        final nameController = TextEditingController(text: name);
+        final emailController = TextEditingController(text: email);
+
         return AlertDialog(
           title: const Text("Edit Profile"),
           content: Column(
@@ -44,19 +48,22 @@ class _ProfilePageState extends State<ProfilePage> {
             children: [
               TextField(
                 decoration: const InputDecoration(labelText: "Name"),
-                controller: TextEditingController(text: name),
+                controller: nameController,
                 onChanged: (value) => tempName = value,
               ),
               const SizedBox(height: 10),
               TextField(
                 decoration: const InputDecoration(labelText: "Email"),
-                controller: TextEditingController(text: email),
+                controller: emailController,
                 onChanged: (value) => tempEmail = value,
               ),
             ],
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(context), child: const Text("Cancel")),
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("Cancel"),
+            ),
             ElevatedButton(
               onPressed: () => Navigator.pop(context, {"name": tempName, "email": tempEmail}),
               child: const Text("Save"),
@@ -78,12 +85,11 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Scaffold(
-      appBar:AppBar(
-        title:const Text("Profile Page"),
-        centerTitle:true,
-        backgroundColor:theme.colorScheme.primaryContainer,
+      appBar: AppBar(
+        title: const Text("Profile Page"),
+        centerTitle: true,
+        backgroundColor: theme.colorScheme.primaryContainer,
       ),
-   
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
@@ -95,18 +101,28 @@ class _ProfilePageState extends State<ProfilePage> {
                   children: [
                     CircleAvatar(
                       radius: 50,
+                      backgroundColor: theme.colorScheme.primaryContainer,
                       backgroundImage: _profileImage != null
-                          ? Image.asset(_profileImage!).image
-                          : const AssetImage('assets/default_avatar.png'),
+                          ? FileImage(File(_profileImage!))
+                          : null,
+                      child: _profileImage == null
+                          ? Icon(
+                              Icons.person,
+                              size: 50,
+                              color: theme.colorScheme.onPrimaryContainer,
+                            )
+                          : null,
                     ),
                     Positioned(
                       bottom: 0,
                       right: 4,
                       child: CircleAvatar(
                         backgroundColor: theme.colorScheme.primary,
+                        radius: 18,
                         child: IconButton(
-                          icon: const Icon(Icons.edit, color: Colors.white, size: 18),
+                          icon: const Icon(Icons.camera_alt, color: Colors.white, size: 18),
                           onPressed: _pickProfileImage,
+                          padding: EdgeInsets.zero,
                         ),
                       ),
                     )
@@ -127,7 +143,6 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
                 Text(email, style: theme.textTheme.bodyMedium),
                 const SizedBox(height: 10),
-
               ],
             ),
           ),
@@ -153,33 +168,59 @@ class _ProfilePageState extends State<ProfilePage> {
           // Settings Section
           Text("Settings", style: theme.textTheme.titleMedium),
           const SizedBox(height: 10),
-      ListTile(
+          ListTile(
             leading: const Icon(Icons.lock_outline),
             title: const Text("Change Password"),
             onTap: () {},
-),
+          ),
           ListTile(
             leading: const Icon(Icons.settings_outlined),
             title: const Text("Settings"),
             onTap: () {},
           ),
-              ListTile(
+          ListTile(
             leading: const Icon(Icons.support_agent),
             title: const Text("Contact Us"),
             onTap: () {
               Navigator.pushNamed(context, '/contact_us');
             },
           ),
-          
           ListTile(
             leading: const Icon(Icons.add_location_alt_sharp),
             title: const Text("Location"),
-            onTap: () {},
+            onTap: () {
+              Navigator.pushNamed(context, '/location');
+            },
           ),
-            ListTile(
+          ListTile(
             leading: const Icon(Icons.logout),
             title: const Text("Logout"),
-            onTap: () {},
+            onTap: () {
+              // Show confirmation dialog
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: const Text('Logout'),
+                  content: const Text('Are you sure you want to logout?'),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text('Cancel'),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        // Add your logout logic here
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Logged out successfully')),
+                        );
+                      },
+                      child: const Text('Logout'),
+                    ),
+                  ],
+                ),
+              );
+            },
           ),
         ],
       ),

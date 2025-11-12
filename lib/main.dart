@@ -41,6 +41,7 @@ class _MyAppState extends State<MyApp> {
 			themeMode: _themeMode,
       routes:{
         '/contact_us':(context)=> const ContactPage(),
+        // '/delivery_location':(context)=>const 
       },
     
 			home: HomePage(
