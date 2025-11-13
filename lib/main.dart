@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'home.dart';
 // import'buttonbar.dart';
+
 import './pages/contact_us.dart';
 import './login_page.dart';
+import 'signup_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -72,6 +74,8 @@ class _MyAppState extends State<MyApp> {
             themeMode: _themeMode,
             onThemeChanged: _updateThemeMode,
           ),
+
+            '/signup': (context)=> const SignupPage(),
             '/contact_us': (context) => const ContactPage(),
             // '/delivery_location':(context)=>const
           },

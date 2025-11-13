@@ -47,8 +47,8 @@ class _MyLoginState extends State<MyLogin> {
         }),
       );
 
-      // print('Response Status Code: ${response.statusCode}');
-      // print('Response Body: ${response.body}');
+      print('Response Status Code: ${response.statusCode}');
+      print('Response Body: ${response.body}');
 
       final data = jsonDecode(response.body);
 
@@ -71,7 +71,7 @@ class _MyLoginState extends State<MyLogin> {
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e')),
+        SnackBar(content: Text('Error: $e ,')),
       );
     } finally {
       setState(() => _isLoading = false);
@@ -87,125 +87,137 @@ class _MyLoginState extends State<MyLogin> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      body: Stack(
-        children: [
-          Container(
-            padding: const EdgeInsets.only(left: 35, top: 130),
-            child: const Text(
-              'Welcome\nBack',
-              style: TextStyle(color: Colors.white, fontSize: 33),
-            ),
-          ),
-          SingleChildScrollView(
-            child: Center(
-              child: Column(
-                children: [
-                  const SizedBox(height: 300),
-                  Form(
-                    key: _formKey,
-                    child: Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 35),
-                      child: Column(
-                        children: [
-                          TextFormField(
-                            controller: _userNameController,
-                            decoration: InputDecoration(
-                              fillColor: Colors.grey.shade200,
-                              filled: true,
-                              hintText: 'Username or Email',
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 30),
-                          TextFormField(
-                            controller: _passwordController,
-                            obscureText: true,
-                            decoration: InputDecoration(
-                              fillColor: Colors.grey.shade100,
-                              filled: true,
-                              hintText: 'Password',
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 40),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              const Text(
-                                'Sign In',
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 27,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                              CircleAvatar(
-                                radius: 30,
-                                backgroundColor: const Color(0xff4c505b),
-                                child: _isLoading
-                                    ? const CircularProgressIndicator(
-                                        color: Colors.white,
-                                      )
-                                    : IconButton(
-                                        color: Colors.white,
-                                        onPressed: _loginUser,
-                                        icon:
-                                            const Icon(Icons.arrow_forward),
-                                      ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 20),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.pushNamed(context, '/signup');
-                                },
-                                child: const Text(
-                                  'Sign Up',
-                                  style: TextStyle(
-                                    decoration: TextDecoration.underline,
-                                    fontSize: 18,
-                                    color: Color(0xff4c505b),
-                                  ),
-                                ),
-                              ),
-                              TextButton(
-                                onPressed: () {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text('Feature coming soon'),
-                                    ),
-                                  );
-                                },
-                                child: const Text(
-                                  'Forgot Password',
-                                  style: TextStyle(
-                                    decoration: TextDecoration.underline,
-                                    fontSize: 18,
-                                    color: Color(0xff4c505b),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
+    return Container(
+      decoration: BoxDecoration(
+        image: DecorationImage(
+          image: const AssetImage('assets/backdrop.png'),
+          fit: BoxFit.cover,
+          onError: (exception, stackTrace) {
+            // Handle image loading error silently
+            debugPrint('Failed to load background image: $exception');
+          },
+        ),
+      ),
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        body: Stack(
+          children: [
+            Container(
+              padding: const EdgeInsets.only(left: 35, top: 130),
+              child: const Text(
+                'Welcome\nBack',
+                style: TextStyle(color: Colors.white, fontSize: 33),
               ),
             ),
-          ),
-        ],
+            SingleChildScrollView(
+              child: Center(
+                child: Column(
+                  children: [
+                    const SizedBox(height: 300),
+                    Form(
+                      key: _formKey,
+                      child: Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 35),
+                        child: Column(
+                          children: [
+                            TextFormField(
+                              controller: _userNameController,
+                              decoration: InputDecoration(
+                                fillColor: Colors.grey.shade200,
+                                filled: true,
+                                hintText: 'Username or Email',
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 30),
+                            TextFormField(
+                              controller: _passwordController,
+                              obscureText: true,
+                              decoration: InputDecoration(
+                                fillColor: Colors.grey.shade100,
+                                filled: true,
+                                hintText: 'Password',
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 40),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                const Text(
+                                  'Sign In',
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 27,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                                CircleAvatar(
+                                  radius: 30,
+                                  backgroundColor: const Color(0xff4c505b),
+                                  child: _isLoading
+                                      ? const CircularProgressIndicator(
+                                          color: Colors.white,
+                                        )
+                                      : IconButton(
+                                          color: Colors.white,
+                                          onPressed: _loginUser,
+                                          icon:
+                                              const Icon(Icons.arrow_forward),
+                                        ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 20),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.pushNamed(context, '/signup');
+                                  },
+                                  child: const Text(
+                                    'Sign Up',
+                                    style: TextStyle(
+                                      decoration: TextDecoration.underline,
+                                      fontSize: 18,
+                                      color: Color(0xff4c505b),
+                                    ),
+                                  ),
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text('Feature coming soon'),
+                                      ),
+                                    );
+                                  },
+                                  child: const Text(
+                                    'Forgot Password',
+                                    style: TextStyle(
+                                      decoration: TextDecoration.underline,
+                                      fontSize: 18,
+                                      color: Color(0xff4c505b),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
