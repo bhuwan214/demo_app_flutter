@@ -20,7 +20,7 @@ class DetailsPage extends StatefulWidget {
 }
 
 class _DetailsPageState extends State<DetailsPage> {
-  bool isFavorite = false;
+  bool isFavorite = true;
   bool isInCart = false;
   late final FavoriteItem favoriteItem;
   late final CartItem cartItem;
@@ -197,10 +197,15 @@ class _DetailsPageState extends State<DetailsPage> {
                       SnackBar(
                         content: Text(
                           isInCart 
-                            ? '${widget.name} removed from cart'
-                            : '${widget.name} added to cart'
+                            ? '${widget.name}  added to cart'
+                            : '${widget.name} removed from cart '
                         ),
                         behavior: SnackBarBehavior.floating,
+                          duration: const Duration(milliseconds: 2500),
+                      animation: CurvedAnimation(
+                        parent: const AlwaysStoppedAnimation(100),
+                        curve: Curves.easeIn,
+                      ),
                       ),
                     );
                   },
@@ -224,8 +229,13 @@ class _DetailsPageState extends State<DetailsPage> {
                     SnackBar(
                       content: Text(
                         isFavorite
-                          ? 'Removed from favorites'
-                          : 'Added to favorites'
+                          ? ' Add to favorites'
+                          : 'Removed from favorites'
+                      ),
+                      duration: const Duration(milliseconds: 2500),
+                      animation: CurvedAnimation(
+                        parent: const AlwaysStoppedAnimation(3.0),
+                        curve: Curves.easeInOut,
                       ),
                       behavior: SnackBarBehavior.floating,
                     ),
