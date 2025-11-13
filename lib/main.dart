@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'home.dart';
 // import'buttonbar.dart';
 import './pages/contact_us.dart';
+import './login_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -63,14 +64,19 @@ class _MyAppState extends State<MyApp> {
           title: 'Demo App',
           debugShowCheckedModeBanner: false,
           theme: Theme.of(context),
+
+
           routes: {
-            '/contact_us': (context) => const ContactPage(),
-            // '/delivery_location':(context)=>const
-          },
-          home: HomePage(
+          
+            '/home':(context)=>  HomePage(
             themeMode: _themeMode,
             onThemeChanged: _updateThemeMode,
           ),
+            '/contact_us': (context) => const ContactPage(),
+            // '/delivery_location':(context)=>const
+          },
+         
+          home: const MyLogin(),
         ),
       ),
     );
