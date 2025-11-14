@@ -35,7 +35,7 @@ class _MyAppState extends State<MyApp> {
         colorScheme: const ColorScheme.dark(
           primary: Colors.orange,
           secondary: Colors.deepOrangeAccent,
-          surface: Color(0xFF1E1E1E),
+          surface: Color.fromARGB(255, 146, 142, 142),
           background: Color(0xFF121212),
           onPrimary: Colors.white,
           onSecondary: Colors.white,
@@ -84,7 +84,7 @@ class _MyAppState extends State<MyApp> {
           },
          
           home:  MyLogin(
-            themeMode: ThemeMode.light,
+            themeMode: _themeMode,
             onThemeChanged :_updateThemeMode,
           ),
         ),
