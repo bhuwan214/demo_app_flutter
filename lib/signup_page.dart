@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import "dart:convert";
 import 'package:http/http.dart' as http;
+import 'dart:async';
+import 'widget/opt_verify.dart';
 
 class SignupPage extends StatefulWidget {
   final ThemeMode themeMode;
@@ -59,7 +61,7 @@ class _SignupPageState extends State<SignupPage> {
             'eEcu_X4XMkspr7fsv6IlrL:APA91bFcUP60TtS7Nf-WMBhpxhFbXLuzYvVmo6e7Iczct6oNH3XUFrM1k0J2sr5pkQ-RGbF7Sssf7JWY5CZnEiApFnq5lvj4MajFpKZ7aqr32Jzxn1IR6W_zoJO7-vl-163q3xnEQ9QS',
       };
       
-      print('Request Body: $requestBody');
+      // print('Request Body: $requestBody');
       
       final response = await http.post(
         Uri.parse(url),
@@ -70,8 +72,8 @@ class _SignupPageState extends State<SignupPage> {
         body: jsonEncode(requestBody),
       );
 
-      print('Response Status Code: ${response.statusCode}');
-      print('Response Body: ${response.body}');
+      // print('Response Status Code: ${response.statusCode}');
+      // print('Response Body: ${response.body}');
 
       // Check if response is JSON before decoding
       if (response.body.trim().startsWith('<')) {
@@ -99,25 +101,14 @@ class _SignupPageState extends State<SignupPage> {
                           data['success'] == true ||
                           data['status'] == 1 ||
                           response.statusCode == 201;
-        print('isSuccess: $isSuccess');
+        // print('isSuccess: $isSuccess');
+
 
         if (isSuccess) {
           if (!mounted) return;
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                data['message'] ?? 'Registration Successful! Please verify OTP sent to $mobile'),
-              backgroundColor: Colors.green,
-              duration: const Duration(seconds: 3),
-            ),
-          );
-
-          // Navigate to login page after successful registration
-          Future.delayed(const Duration(seconds: 2), () {
-            if (mounted) {
-              Navigator.pushReplacementNamed(context, '/login');
-            }
-          });
+          
+          // Show OTP verification dialog
+          _showOtpDialog(mobile, firstName, lastName);
         } else {
           if (!mounted) return;
           // Get error message from various possible fields
@@ -174,6 +165,20 @@ class _SignupPageState extends State<SignupPage> {
     } finally {
       setState(() => _isLoading = false);
     }
+  }
+
+  void _showOtpDialog(String mobile, String firstName, String lastName) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return OtpVerificationDialog(
+          mobileNumber: mobile,
+          firstName: firstName,
+          lastName: lastName,
+        );
+      },
+    );
   }
 
   @override
@@ -558,3 +563,4 @@ class SignupTopBar extends StatelessWidget {
     );
   }
 }
+
