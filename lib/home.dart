@@ -42,7 +42,7 @@ class _HomePageState extends State<HomePage> {
     ];
 
     return Scaffold(
-      // body: ThemeToggle(widget: widget),
+
       body: pages[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,

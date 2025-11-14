@@ -74,13 +74,19 @@ class _MyAppState extends State<MyApp> {
             themeMode: _themeMode,
             onThemeChanged: _updateThemeMode,
           ),
-
+            '/login':(context)=>  MyLogin(
+              themeMode: _themeMode,
+            onThemeChanged: _updateThemeMode,
+            ),
             '/signup': (context)=> const SignupPage(),
             '/contact_us': (context) => const ContactPage(),
             // '/delivery_location':(context)=>const
           },
          
-          home: const MyLogin(),
+          home:  MyLogin(
+            themeMode: ThemeMode.light,
+            onThemeChanged :_updateThemeMode,
+          ),
         ),
       ),
     );

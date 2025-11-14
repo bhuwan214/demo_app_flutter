@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../grid.dart';
-import '../productpage.dart';
 import 'package:demo_app/widget/search_field.dart';
 
 class HomeBody extends StatefulWidget {
@@ -170,34 +169,34 @@ class _HomeBodyState extends State<HomeBody> {
   }
 }
 
-class _CategoryChip extends StatelessWidget {
-  final String label;
-  final bool isSelected;
+// class _CategoryChip extends StatelessWidget {
+//   final String label;
+//   final bool isSelected;
 
-  const _CategoryChip({required this.label, required this.isSelected});
+//   const _CategoryChip({required this.label, required this.isSelected});
 
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+//   @override
+//   Widget build(BuildContext context) {
+//     final colorScheme = Theme.of(context).colorScheme;
+//     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return Padding(
-      padding: const EdgeInsets.only(right: 8.0),
-      child: FilterChip(
-        label: Text(label),
-        selected: isSelected,
-        onSelected: (bool value) {},
-        backgroundColor: isDark ? colorScheme.surfaceContainerHighest : colorScheme.surfaceContainerHigh,
-        selectedColor: colorScheme.primary,
-        labelStyle: TextStyle(
-          color: isSelected ? colorScheme.onPrimary : colorScheme.onSurface,
-          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-        ),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      ),
-    );
-  }
-}
+//     return Padding(
+//       padding: const EdgeInsets.only(right: 8.0),
+//       child: FilterChip(
+//         label: Text(label),
+//         selected: isSelected,
+//         onSelected: (bool value) {},
+//         backgroundColor: isDark ? colorScheme.surfaceContainerHighest : colorScheme.surfaceContainerHigh,
+//         selectedColor: colorScheme.primary,
+//         labelStyle: TextStyle(
+//           color: isSelected ? colorScheme.onPrimary : colorScheme.onSurface,
+//           fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+//         ),
+//         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+//       ),
+//     );
+//   }
+// }
 
 class PopularProduct extends StatefulWidget {
   const PopularProduct({super.key});

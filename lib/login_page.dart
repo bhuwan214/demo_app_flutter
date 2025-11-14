@@ -3,7 +3,14 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class MyLogin extends StatefulWidget {
-  const MyLogin({super.key});
+  final ThemeMode themeMode;
+  final ValueChanged<ThemeMode> onThemeChanged;
+
+  const MyLogin({
+    Key? key,
+    required this.themeMode,
+    required this.onThemeChanged,
+  }) : super(key: key);
 
   @override
   State<MyLogin> createState() => _MyLoginState();
@@ -47,31 +54,35 @@ class _MyLoginState extends State<MyLogin> {
         }),
       );
 
-      print('Response Status Code: ${response.statusCode}');
-      print('Response Body: ${response.body}');
-
       final data = jsonDecode(response.body);
 
-      if ((response.statusCode == 200 || response.statusCode == 203) && 
+      if ((response.statusCode == 200 || response.statusCode == 203) &&
           (data['status'] == true || data['success'] == true)) {
         final userData = data['data'] ?? data['user'];
         final userName = userData?['first_name'] ?? userData?['name'] ?? 'User';
-        
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Login Successful! Welcome $userName'),
+            backgroundColor: Colors.green,
           ),
         );
 
         Navigator.pushReplacementNamed(context, '/home');
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(data['message'] ?? 'Login failed')),
+          SnackBar(
+            content: Text(data['message'] ?? 'Login failed'),
+            backgroundColor: Colors.red,
+          ),
         );
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e ,')),
+        SnackBar(
+          content: Text('Error: $e'),
+          backgroundColor: Colors.red,
+        ),
       );
     } finally {
       setState(() => _isLoading = false);
@@ -87,13 +98,22 @@ class _MyLoginState extends State<MyLogin> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDarkMode = widget.themeMode == ThemeMode.dark;
+
     return Container(
       decoration: BoxDecoration(
         image: DecorationImage(
-          image: const AssetImage('assets/backdrop.png'),
+          image: const AssetImage('assets/toonbackdrop.jpg'),
           fit: BoxFit.cover,
+          colorFilter: ColorFilter.mode(
+            isDarkMode 
+                ? Colors.black.withOpacity(0.6) 
+                : Colors.black.withOpacity(0.3),
+            BlendMode.darken,
+          ),
           onError: (exception, stackTrace) {
-            // Handle image loading error silently
             debugPrint('Failed to load background image: $exception');
           },
         ),
@@ -102,77 +122,158 @@ class _MyLoginState extends State<MyLogin> {
         backgroundColor: Colors.transparent,
         body: Stack(
           children: [
-            Container(
-              padding: const EdgeInsets.only(left: 35, top: 130),
-              child: const Text(
-                'Welcome\nBack',
-                style: TextStyle(color: Colors.white, fontSize: 33),
-              ),
-            ),
+            // Header with Welcome Text and Theme Toggle
+
+            // Login Form
             SingleChildScrollView(
               child: Center(
                 child: Column(
+                 
                   children: [
-                    const SizedBox(height: 300),
+                                topbar(isDarkMode: isDarkMode, colorScheme: colorScheme, widget: widget),
+
+                    const SizedBox(height: 40),
                     Form(
                       key: _formKey,
                       child: Container(
                         margin: const EdgeInsets.symmetric(horizontal: 35),
+                        padding: const EdgeInsets.all(30),
+                        decoration: BoxDecoration(
+                          color: colorScheme.surface.withOpacity(0.95),
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.3),
+                              blurRadius: 20,
+                              offset: const Offset(0, 10),
+                            ),
+                          ],
+                        ),
                         child: Column(
                           children: [
+                            // Username Field
                             TextFormField(
                               controller: _userNameController,
+                              style: TextStyle(color: colorScheme.onSurface),
                               decoration: InputDecoration(
-                                fillColor: Colors.grey.shade200,
+                                fillColor: isDarkMode
+                                    ? colorScheme.surface
+                                    : Colors.grey[100],
                                 filled: true,
                                 hintText: 'Username or Email',
+                                hintStyle: TextStyle(
+                                  color: colorScheme.onSurface.withOpacity(0.5),
+                                ),
+                                prefixIcon: Icon(
+                                  Icons.person_outline,
+                                  // color: colorScheme.primary,
+                                ),
                                 border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10),
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: BorderSide.none,
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: BorderSide(
+                                    color: colorScheme.outline.withOpacity(0.2),
+                                  ),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: BorderSide(
+                                    color: colorScheme.primary,
+                                    width: 2,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 20),
+
+                            // Password Field
+                            TextFormField(
+                              controller: _passwordController,
+                              obscureText: true,
+                              style: TextStyle(color: colorScheme.onSurface),
+                              decoration: InputDecoration(
+                                fillColor: isDarkMode
+                                    ? colorScheme.surface
+                                    : Colors.grey[100],
+                                filled: true,
+                                hintText: 'Password',
+                                hintStyle: TextStyle(
+                                  color: colorScheme.onSurface.withOpacity(0.5),
+                                ),
+                                prefixIcon: Icon(
+                                  Icons.lock_outline,
+                                  color: colorScheme.primary,
+                                ),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: BorderSide.none,
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: BorderSide(
+                                    color: colorScheme.outline.withOpacity(0.2),
+                                  ),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: BorderSide(
+                                    color: colorScheme.primary,
+                                    width: 2,
+                                  ),
                                 ),
                               ),
                             ),
                             const SizedBox(height: 30),
-                            TextFormField(
-                              controller: _passwordController,
-                              obscureText: true,
-                              decoration: InputDecoration(
-                                fillColor: Colors.grey.shade100,
-                                filled: true,
-                                hintText: 'Password',
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10),
+
+                            // Sign In Button
+                            SizedBox(
+                              width: double.infinity,
+                              height: 56,
+                              child: ElevatedButton(
+                                onPressed: _isLoading ? null : _loginUser,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: colorScheme.primary,
+                                  foregroundColor: colorScheme.onPrimary,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  elevation: 3,
                                 ),
+                                child: _isLoading
+                                    ? const SizedBox(
+                                        height: 24,
+                                        width: 24,
+                                        child: CircularProgressIndicator(
+                                          color: Colors.white,
+                                          strokeWidth: 2.5,
+                                        ),
+                                      )
+                                    : Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          const Text(
+                                            'Sign In',
+                                            style: TextStyle(
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                          const SizedBox(width: 8),
+                                          Icon(
+                                            Icons.arrow_forward,
+                                            color: colorScheme.onPrimary,
+                                          ),
+                                        ],
+                                      ),
                               ),
                             ),
-                            const SizedBox(height: 40),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                const Text(
-                                  'Sign In',
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 27,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                ),
-                                CircleAvatar(
-                                  radius: 30,
-                                  backgroundColor: const Color(0xff4c505b),
-                                  child: _isLoading
-                                      ? const CircularProgressIndicator(
-                                          color: Colors.white,
-                                        )
-                                      : IconButton(
-                                          color: Colors.white,
-                                          onPressed: _loginUser,
-                                          icon:
-                                              const Icon(Icons.arrow_forward),
-                                        ),
-                                ),
-                              ],
-                            ),
                             const SizedBox(height: 20),
+
+                            // Sign Up and Forgot Password
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
@@ -180,29 +281,31 @@ class _MyLoginState extends State<MyLogin> {
                                   onPressed: () {
                                     Navigator.pushNamed(context, '/signup');
                                   },
-                                  child: const Text(
+                                  child: Text(
                                     'Sign Up',
                                     style: TextStyle(
-                                      decoration: TextDecoration.underline,
-                                      fontSize: 18,
-                                      color: Color(0xff4c505b),
+                                      fontSize: 16,
+                                      color: colorScheme.primary,
+                                      fontWeight: FontWeight.w500,
                                     ),
                                   ),
                                 ),
                                 TextButton(
                                   onPressed: () {
                                     ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text('Feature coming soon'),
+                                      SnackBar(
+                                        content:
+                                            const Text('Feature coming soon'),
+                                        backgroundColor: colorScheme.primary,
                                       ),
                                     );
                                   },
-                                  child: const Text(
-                                    'Forgot Password',
+                                  child: Text(
+                                    'Forgot Password?',
                                     style: TextStyle(
-                                      decoration: TextDecoration.underline,
-                                      fontSize: 18,
-                                      color: Color(0xff4c505b),
+                                      fontSize: 16,
+                                      color: colorScheme.primary,
+                                      fontWeight: FontWeight.w500,
                                     ),
                                   ),
                                 ),
@@ -212,12 +315,80 @@ class _MyLoginState extends State<MyLogin> {
                         ),
                       ),
                     ),
+                    const SizedBox(height: 40),
                   ],
                 ),
               ),
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class topbar extends StatelessWidget {
+  const topbar({
+    super.key,
+    required this.isDarkMode,
+    required this.colorScheme,
+    required this.widget,
+  });
+
+  final bool isDarkMode;
+  final ColorScheme colorScheme;
+  final MyLogin widget;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.only(left: 35, top:75, right: 35),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            'Welcome\nBack',
+            style: TextStyle(
+              color: isDarkMode ? Colors.white : Colors.white,
+              fontSize: 33,
+              fontWeight: FontWeight.w700,
+              shadows: [
+                Shadow(
+                  blurRadius: 10.0,
+                  color: Colors.black.withOpacity(0.5),
+                  offset: const Offset(2.0, 2.0),
+                ),
+              ],
+            ),
+          ),
+          // Theme Toggle Button
+          Container(
+            decoration: BoxDecoration(
+              color: colorScheme.surface.withOpacity(0.9),
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.2),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: IconButton(
+              onPressed: () {
+                // Toggle theme
+                widget.onThemeChanged(
+                  isDarkMode ? ThemeMode.light : ThemeMode.dark,
+                );
+              },
+              icon: Icon(
+                isDarkMode ? Icons.light_mode : Icons.dark_mode,
+                color: colorScheme.primary,
+              ),
+              tooltip: isDarkMode ? 'Light Mode' : 'Dark Mode',
+            ),
+          ),
+        ],
       ),
     );
   }
