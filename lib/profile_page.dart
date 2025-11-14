@@ -230,14 +230,15 @@ class _ProfilePageState extends State<ProfilePage> {
                       onPressed: () {
                         Navigator.pop(context);
                         // Add your logout logic here
+                        Navigator.pushNamed(context, '/login');
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Logged out successfully')),
+                          const SnackBar(content: Text('Logged out successfully'),duration:Duration(seconds: 1) ,),
                         );
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.red,
                       ),
-                      child: const Text('Logout'),
+                      child: const Text('Logout', style: TextStyle(color: Color.fromARGB(255, 241, 238, 238))),
                     ),
                   ],
                 ),
