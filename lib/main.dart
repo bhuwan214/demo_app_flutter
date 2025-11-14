@@ -69,24 +69,26 @@ class _MyAppState extends State<MyApp> {
 
 
           routes: {
-          
-            '/home':(context)=>  HomePage(
-            themeMode: _themeMode,
-            onThemeChanged: _updateThemeMode,
-          ),
-            '/login':(context)=>  MyLogin(
+        '/home': (context) => HomePage(
               themeMode: _themeMode,
-            onThemeChanged: _updateThemeMode,
+              onThemeChanged: _updateThemeMode,
             ),
-            '/signup': (context)=> const SignupPage(),
-            '/contact_us': (context) => const ContactPage(),
-            // '/delivery_location':(context)=>const
-          },
-         
-          home:  MyLogin(
-            themeMode: _themeMode,
-            onThemeChanged :_updateThemeMode,
-          ),
+        '/login': (context) => MyLogin(
+              themeMode: _themeMode,
+              onThemeChanged: _updateThemeMode,
+            ),
+        '/signup': (context) => SignupPage(
+              themeMode: _themeMode,
+              onThemeChanged: _updateThemeMode,
+            ),
+        '/contact_us': (context) => const ContactPage(),
+      },
+
+      // Initial Route
+      home: MyLogin(
+        themeMode: _themeMode,
+        onThemeChanged: _updateThemeMode,
+      ),
         ),
       ),
     );
