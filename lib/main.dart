@@ -5,6 +5,7 @@ import 'home.dart';
 import './pages/contact_us.dart';
 import './login_page.dart';
 import 'signup_page.dart';
+import 'package:demo_app/pages/add_addres.dart';
 
 void main() {
   runApp(const MyApp());
@@ -82,7 +83,9 @@ class _MyAppState extends State<MyApp> {
               onThemeChanged: _updateThemeMode,
             ),
         '/contact_us': (context) => const ContactPage(),
+        '/add_address': (context) => const AddAddressPage (),
       },
+
 
       // Initial Route
       home: MyLogin(

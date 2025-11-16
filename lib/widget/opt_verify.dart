@@ -285,7 +285,7 @@ Row(
       padding: const EdgeInsets.symmetric(horizontal: 6), // EVEN SPACING
       child: SizedBox(
         width: 34,
-        height: 50,
+        height: 50 ,
         child: TextField(
           controller: _otpControllers[index],
           focusNode: _focusNodes[index],

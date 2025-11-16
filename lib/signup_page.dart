@@ -88,10 +88,10 @@ class _SignupPageState extends State<SignupPage> {
       }
 
       final data = jsonDecode(response.body);
-      print('Parsed data: $data');
-      print('Status field: ${data['status']}');
-      print('Success field: ${data['success']}');
-      print('Message field: ${data['message']}');
+      // print('Parsed data: $data');
+      // print('Status field: ${data['status']}');
+      // print('Success field: ${data['success']}');
+      // print('Message field: ${data['message']}');
 
       if (response.statusCode == 200 ||
           response.statusCode == 201 ||
@@ -121,10 +121,10 @@ class _SignupPageState extends State<SignupPage> {
             SnackBar(
               content: Text(errorMsg),
               backgroundColor: Colors.red,
-              duration: const Duration(seconds: 4),
+              duration: const Duration(seconds: 2),
             ),
           );
-          print('Full error data: $data');
+          // print('Full error data: $data');
         }
       } else if (response.statusCode == 409) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -155,7 +155,7 @@ class _SignupPageState extends State<SignupPage> {
         );
       }
     } catch (e) {
-      print('Signup Error: $e');
+      // print('Signup Error: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Network error. Please check your connection.'),

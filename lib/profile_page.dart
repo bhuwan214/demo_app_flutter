@@ -180,6 +180,15 @@ class _ProfilePageState extends State<ProfilePage> {
             onTap: () {},
           ),
 
+            ListTile(
+            leading: const Icon(Icons.add_location_alt_sharp),
+            title: const Text("Add Delivery Location"),
+            onTap: () {
+              Navigator.pushNamed(context, '/add_address');
+            },
+          ),
+
+
           ListTile(
             leading: const Icon(Icons.lock_outline),
             title: const Text("Change Password"),
@@ -200,14 +209,7 @@ class _ProfilePageState extends State<ProfilePage> {
             },
           ),
 
-          ListTile(
-            leading: const Icon(Icons.add_location_alt_sharp),
-            title: const Text("Location"),
-            onTap: () {
-              Navigator.pushNamed(context, '/location');
-            },
-          ),
-
+        
           const Divider(),
           const SizedBox(height: 10),
 

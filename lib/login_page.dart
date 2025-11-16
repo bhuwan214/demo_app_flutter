@@ -122,16 +122,12 @@ class _MyLoginState extends State<MyLogin> {
         backgroundColor: Colors.transparent,
         body: Stack(
           children: [
-            // Header with Welcome Text and Theme Toggle
 
-            // Login Form
             SingleChildScrollView(
               child: Center(
                 child: Column(
-                 
                   children: [
                                 topbar(isDarkMode: isDarkMode, colorScheme: colorScheme, widget: widget),
-
                     const SizedBox(height: 40),
                     Form(
                       key: _formKey,
