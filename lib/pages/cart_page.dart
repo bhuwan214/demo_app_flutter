@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:demo_app/pages/detail_page.dart';
-// import 'package:demo_app/profilepages/my_orders.dart';
+import 'package:demo_app/pages/checkout_page.dart';
 
 class CartItem {
   final String name;
@@ -61,9 +61,14 @@ void toggleCartItem(CartItem item) {
   }
 }
 
-class CartPage extends StatelessWidget {
+class CartPage extends StatefulWidget {
   const CartPage({super.key});
 
+  @override
+  State<CartPage> createState() => _CartPageState();
+}
+
+class _CartPageState extends State<CartPage> {
   double calculateTotal(List<CartItem> items) {
     double total = 0;
     for (var item in items) {
@@ -73,6 +78,8 @@ class CartPage extends StatelessWidget {
     }
     return total;
   }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -247,53 +254,49 @@ class CartPage extends StatelessWidget {
                         );
                       },
                     ),
-                    // ElevatedButton(
-                    //   onPressed: () {
-                    //     // Get selected items
-                    //     final selectedItems = list
-                    //         .where((item) => item.isSelected)
-                    //         .toList();
+                    ElevatedButton(
+                      onPressed: () {
+                        // Get selected items
+                        final selectedItems = list
+                            .where((item) => item.isSelected)
+                            .toList();
 
-                    //     if (selectedItems.isEmpty) {
-                    //       ScaffoldMessenger.of(context).showSnackBar(
-                    //         const SnackBar(
-                    //           content: Text('Please select items to checkout'),
-                    //         ),
-                    //       );
-                    //       return;
-                    //     }
+                        if (selectedItems.isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Please select items to checkout'),
+                            ),
+                          );
+                          return;
+                        }
 
-                    //     // Transfer selected items to orders
-                    //     for (var item in selectedItems) {
-                    //       addOrder(
-                    //         OrderItem(
-                    //           title: item.title,
-                    //           imageUrl: item.imageUrl,
-                    //           price: item.price,
-                    //           description: item.description,
-                    //           quantity: item.quantity,
-                    //           orderDate: DateTime.now(),
-                    //         ),
-                    //       );
-                    //     }
-
-                    //     // Remove selected items from cart
-                    //     final remainingItems = list
-                    //         .where((item) => !item.isSelected)
-                    //         .toList();
-                    //     cartNotifier.value = remainingItems;
-
-                    //     ScaffoldMessenger.of(context).showSnackBar(
-                    //       SnackBar(
-                    //         content: Text(
-                    //           'Order placed successfully! ${selectedItems.length} item(s) ordered.',
-                    //         ),
-                    //         backgroundColor: Colors.green,
-                    //       ),
-                    //     );
-                    //   },
-                    //   child: const Text('Checkout'),
-                    // ),
+                        // Navigate to checkout page
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => CheckoutPage(
+                              cartItems: selectedItems,
+                              totalAmount: calculateTotal(selectedItems),
+                            ),
+                          ),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 12,
+                        ),
+                      ),
+                      child: const Text(
+                        'Checkout',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),
