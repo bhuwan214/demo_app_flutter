@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'services/auth_service.dart';
 
 class MyLogin extends StatefulWidget {
   final ThemeMode themeMode;
@@ -60,16 +61,43 @@ class _MyLoginState extends State<MyLogin> {
           (data['status'] == true || data['success'] == true)) {
         final userData = data['data'] ?? data['user'];
         final userName = userData?['first_name'] ?? userData?['name'] ?? 'User';
+        
+        // Extract token from response - check multiple possible locations
+        final token = data['token'] ?? 
+                     data['access_token'] ?? 
+                     data['api_token'] ??  // ✅ ADDED: Check for api_token
+                     userData?['token'] ?? 
+                     userData?['access_token'];
+        
+        if (token != null) {
+          // Save authentication data
+          await AuthService.saveLoginResponse(
+            token: token,
+            userData: userData ?? {},
+          );
+          
+          if (!mounted) return;
+          
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Login Successful! Welcome $userName'),
+              backgroundColor: Colors.green,
+            ),
+          );
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Login Successful! Welcome $userName'),
-            backgroundColor: Colors.green,
-          ),
-        );
-
-        Navigator.pushReplacementNamed(context, '/home');
+          Navigator.pushReplacementNamed(context, '/home');
+        } else {
+          if (!mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Login successful but token not received'),
+              backgroundColor: Colors.orange,
+            ),
+          );
+          Navigator.pushReplacementNamed(context, '/home');
+        }
       } else {
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(data['message'] ?? 'Login failed'),
@@ -78,6 +106,7 @@ class _MyLoginState extends State<MyLogin> {
         );
       }
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Error: $e'),
@@ -85,7 +114,9 @@ class _MyLoginState extends State<MyLogin> {
         ),
       );
     } finally {
-      setState(() => _isLoading = false);
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 

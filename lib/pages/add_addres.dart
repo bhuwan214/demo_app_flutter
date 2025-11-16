@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import '../services/auth_service.dart';
 
 class AddAddressPage extends StatefulWidget {
   const AddAddressPage({super.key});
@@ -38,7 +39,25 @@ class _AddAddressPageState extends State<AddAddressPage> {
     setState(() => _isLoadingAddresses = true);
 
     const String url = 'https://ecommerce.atithyahms.com/api/ecommerce/customer/address/';
-    const String token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIxIiwianRpIjoiNzdiNWRhNjY2NmEyMGFiNTYyZDdkZTA4MDVhYzFlYjc0ZWM5MThjYjA3ZGJiYWEzMjQwMzUwY2U4MzAyNTZiZjA1ODVlMGRhMWIyZmNkNjkiLCJpYXQiOjE3NjMyNzQ3NzgsIm5iZiI6MTc2MzI3NDc3OCwiZXhwIjoxNzk0ODEwNzc4LCJzdWIiOiI1MDciLCJzY29wZXMiOltdfQ.mNLd3nAxIKdipWnBChIln91Fu5xB9BX0ZpdwbjLRUbieos_UZfllq9oFVlI64eVygsKi4pQO_A4otTnvlpnOHzvfOIjNYFw0ZfesEIFViH9sGWr_coAH1FYJpLiWbyQ0hM8SHbfnJi3fMbCo1X7vdcsUlmJeDf1jeTx4_7O7jXeIULADBknhwN24WmhkhLROXCbGs-FIn3o2LWlDLNzGQUkzJWgzFyyj2wdiCge4pnn1TbPYFQ9cedZQ7jBCuu1BrLCKP94pSe-g_bCj1Nno1q3vPUwVpkAsRYkXw2wZV7olbmDUQhTZYqLELcFDPxJaeymLO1OwHI-wtCAmKmRM7zTs8ZvxqgvWN_MN14gBWzadUIsnZoE4r-WBnd62CrtDHcEo317viNTHJz6AvJml9ByapfKo0xuJdgdgywsZy4T_FXENP3DQnHyO4RawYU3BhjI_pr5Fq1FHDayWzs3c8NzpRwykQvykJ2fzEzdQrPj3Xl1fovB_Pu7puolZneLcmJzoxwsfBMJQDmgizFzcjQEq67nYskegwc3HhOpZMxk1QgezJXycRWA4pCjzLRyUGSDoaLZcA-dgrkNWsUlPn3wGxkgla61VMiPJAYbCjCyia7mTiJG5qEkQwBN-Ovb-_G7xfOEjvHzIy5m_A1w7bL5cQ3WVOQRvCTPEA__6UIw';
+    
+    // Get token from AuthService
+    final token = await AuthService.getToken();
+    
+    // Debug: Check token
+    print('🔍 Fetching addresses - Token: ${token != null && token.isNotEmpty ? "Found (${token.substring(0, 10)}...)" : "NOT FOUND"}');
+    
+    if (token == null || token.isEmpty) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Authentication token not found. Please login again.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      setState(() => _isLoadingAddresses = false);
+      Navigator.pushReplacementNamed(context, '/login');
+      return;
+    }
 
     try {
       final response = await http.get(
@@ -128,6 +147,25 @@ class _AddAddressPageState extends State<AddAddressPage> {
     setState(() => _isLoading = true);
 
     const String url = 'https://ecommerce.atithyahms.com/api/ecommerce/customer/address/save';
+    
+    // Get token from AuthService
+    final token = await AuthService.getToken();
+    
+    // Debug: Check token
+    print('🔍 Submitting address - Token: ${token != null && token.isNotEmpty ? "Found (${token.substring(0, 10)}...)" : "NOT FOUND"}');
+    
+    if (token == null || token.isEmpty) {
+      setState(() => _isLoading = false);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Authentication token not found. Please login again.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      Navigator.pushReplacementNamed(context, '/login');
+      return;
+    }
 
     final Map<String, dynamic> addressData = {
       'delivery_area': _deliveryAreaController.text.trim(),
@@ -147,7 +185,7 @@ class _AddAddressPageState extends State<AddAddressPage> {
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIxIiwianRpIjoiNzdiNWRhNjY2NmEyMGFiNTYyZDdkZTA4MDVhYzFlYjc0ZWM5MThjYjA3ZGJiYWEzMjQwMzUwY2U4MzAyNTZiZjA1ODVlMGRhMWIyZmNkNjkiLCJpYXQiOjE3NjMyNzQ3NzgsIm5iZiI6MTc2MzI3NDc3OCwiZXhwIjoxNzk0ODEwNzc4LCJzdWIiOiI1MDciLCJzY29wZXMiOltdfQ.mNLd3nAxIKdipWnBChIln91Fu5xB9BX0ZpdwbjLRUbieos_UZfllq9oFVlI64eVygsKi4pQO_A4otTnvlpnOHzvfOIjNYFw0ZfesEIFViH9sGWr_coAH1FYJpLiWbyQ0hM8SHbfnJi3fMbCo1X7vdcsUlmJeDf1jeTx4_7O7jXeIULADBknhwN24WmhkhLROXCbGs-FIn3o2LWlDLNzGQUkzJWgzFyyj2wdiCge4pnn1TbPYFQ9cedZQ7jBCuu1BrLCKP94pSe-g_bCj1Nno1q3vPUwVpkAsRYkXw2wZV7olbmDUQhTZYqLELcFDPxJaeymLO1OwHI-wtCAmKmRM7zTs8ZvxqgvWN_MN14gBWzadUIsnZoE4r-WBnd62CrtDHcEo317viNTHJz6AvJml9ByapfKo0xuJdgdgywsZy4T_FXENP3DQnHyO4RawYU3BhjI_pr5Fq1FHDayWzs3c8NzpRwykQvykJ2fzEzdQrPj3Xl1fovB_Pu7puolZneLcmJzoxwsfBMJQDmgizFzcjQEq67nYskegwc3HhOpZMxk1QgezJXycRWA4pCjzLRyUGSDoaLZcA-dgrkNWsUlPn3wGxkgla61VMiPJAYbCjCyia7mTiJG5qEkQwBN-Ovb-_G7xfOEjvHzIy5m_A1w7bL5cQ3WVOQRvCTPEA__6UIw',
+          'Authorization': 'Bearer $token',
         },
         body: jsonEncode(addressData),
       );

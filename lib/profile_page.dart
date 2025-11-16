@@ -192,7 +192,9 @@ class _ProfilePageState extends State<ProfilePage> {
           ListTile(
             leading: const Icon(Icons.lock_outline),
             title: const Text("Change Password"),
-            onTap: () {},
+            onTap: () {
+              Navigator.pushNamed(context, '/password_reset');
+            },
           ),
 
           ListTile(

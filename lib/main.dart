@@ -1,3 +1,4 @@
+import 'package:demo_app/pages/password_reset.dart';
 import 'package:flutter/material.dart';
 import 'home.dart';
 // import'buttonbar.dart';
@@ -84,7 +85,9 @@ class _MyAppState extends State<MyApp> {
             ),
         '/contact_us': (context) => const ContactPage(),
         '/add_address': (context) => const AddAddressPage (),
+        '/password_reset': (context) => PasswordResetPage()
       },
+
 
 
       // Initial Route
