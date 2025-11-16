@@ -21,9 +21,70 @@ class _AddAddressPageState extends State<AddAddressPage> {
 
   bool _isLoading = false;
   bool _showForm = false; // Toggle between form and address list
+  bool _isLoadingAddresses = true;
+  bool _isEditMode = false;
+  int? _editingIndex;
   String _selectedNickname = 'Home';
   final List<String> _nicknameOptions = ['Home', 'Office', 'Other'];
-  final List<Map<String, dynamic>> _savedAddresses = []; // Store saved addresses
+  List<Map<String, dynamic>> _savedAddresses = []; // Store saved addresses
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchAddresses();
+  }
+
+  Future<void> _fetchAddresses() async {
+    setState(() => _isLoadingAddresses = true);
+
+    const String url = 'https://ecommerce.atithyahms.com/api/ecommerce/customer/address/';
+    const String token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIxIiwianRpIjoiNzdiNWRhNjY2NmEyMGFiNTYyZDdkZTA4MDVhYzFlYjc0ZWM5MThjYjA3ZGJiYWEzMjQwMzUwY2U4MzAyNTZiZjA1ODVlMGRhMWIyZmNkNjkiLCJpYXQiOjE3NjMyNzQ3NzgsIm5iZiI6MTc2MzI3NDc3OCwiZXhwIjoxNzk0ODEwNzc4LCJzdWIiOiI1MDciLCJzY29wZXMiOltdfQ.mNLd3nAxIKdipWnBChIln91Fu5xB9BX0ZpdwbjLRUbieos_UZfllq9oFVlI64eVygsKi4pQO_A4otTnvlpnOHzvfOIjNYFw0ZfesEIFViH9sGWr_coAH1FYJpLiWbyQ0hM8SHbfnJi3fMbCo1X7vdcsUlmJeDf1jeTx4_7O7jXeIULADBknhwN24WmhkhLROXCbGs-FIn3o2LWlDLNzGQUkzJWgzFyyj2wdiCge4pnn1TbPYFQ9cedZQ7jBCuu1BrLCKP94pSe-g_bCj1Nno1q3vPUwVpkAsRYkXw2wZV7olbmDUQhTZYqLELcFDPxJaeymLO1OwHI-wtCAmKmRM7zTs8ZvxqgvWN_MN14gBWzadUIsnZoE4r-WBnd62CrtDHcEo317viNTHJz6AvJml9ByapfKo0xuJdgdgywsZy4T_FXENP3DQnHyO4RawYU3BhjI_pr5Fq1FHDayWzs3c8NzpRwykQvykJ2fzEzdQrPj3Xl1fovB_Pu7puolZneLcmJzoxwsfBMJQDmgizFzcjQEq67nYskegwc3HhOpZMxk1QgezJXycRWA4pCjzLRyUGSDoaLZcA-dgrkNWsUlPn3wGxkgla61VMiPJAYbCjCyia7mTiJG5qEkQwBN-Ovb-_G7xfOEjvHzIy5m_A1w7bL5cQ3WVOQRvCTPEA__6UIw';
+
+    try {
+      final response = await http.get(
+        Uri.parse(url),
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      if (!mounted) return;
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        if (data['data'] != null && data['data'] is List) {
+          setState(() {
+            _savedAddresses = List<Map<String, dynamic>>.from(
+              data['data'].map((address) => {
+                'id': address['id'],
+                'delivery_area': address['delivery_area'] ?? '',
+                'complete_address': address['complete_address'] ?? '',
+                'contact_no': address['contact_no'] ?? '',
+                'delivery_instructions': address['delivery_instructions'] ?? '',
+                'latitude': address['latitude'] ?? '',
+                'longitude': address['longitude'] ?? '',
+                'nickname': address['nickname'] ?? 'Home',
+              }),
+            );
+          });
+        }
+      }
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error loading addresses: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _isLoadingAddresses = false);
+      }
+    }
+  }
 
   @override
   void dispose() {
@@ -35,6 +96,28 @@ class _AddAddressPageState extends State<AddAddressPage> {
     _longitudeController.dispose();
     _nicknameController.dispose();
     super.dispose();
+  }
+
+  void _editAddress(int index) {
+    final address = _savedAddresses[index];
+    setState(() {
+      _isEditMode = true;
+      _editingIndex = index;
+      _showForm = true;
+      _deliveryAreaController.text = address['delivery_area'];
+      _completeAddressController.text = address['complete_address'];
+      _contactNoController.text = address['contact_no'];
+      _deliveryInstructionsController.text = address['delivery_instructions'];
+      _latitudeController.text = address['latitude'];
+      _longitudeController.text = address['longitude'];
+      
+      if (['Home', 'Office'].contains(address['nickname'])) {
+        _selectedNickname = address['nickname'];
+      } else {
+        _selectedNickname = 'Other';
+        _nicknameController.text = address['nickname'];
+      }
+    });
   }
 
   Future<void> _submitAddress() async {
@@ -78,20 +161,13 @@ class _AddAddressPageState extends State<AddAddressPage> {
                          response.statusCode == 201;
 
         if (isSuccess) {
-          // Add to saved addresses list
+          // Reload addresses from API
+          await _fetchAddresses();
+          
           setState(() {
-            _savedAddresses.add({
-              'delivery_area': _deliveryAreaController.text.trim(),
-              'complete_address': _completeAddressController.text.trim(),
-              'contact_no': _contactNoController.text.trim(),
-              'delivery_instructions': _deliveryInstructionsController.text.trim(),
-              'latitude': _latitudeController.text.trim(),
-              'longitude': _longitudeController.text.trim(),
-              'nickname': _selectedNickname == 'Other' 
-                  ? _nicknameController.text.trim() 
-                  : _selectedNickname,
-            });
-            _showForm = false; // Hide form after saving
+            _showForm = false;
+            _isEditMode = false;
+            _editingIndex = null;
           });
           
           // Clear form fields
@@ -105,8 +181,8 @@ class _AddAddressPageState extends State<AddAddressPage> {
           _selectedNickname = 'Home';
           
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Address added successfully!'),
+            SnackBar(
+              content: Text(_isEditMode ? 'Address updated successfully!' : 'Address added successfully!'),
               backgroundColor: Colors.green,
             ),
           );
@@ -158,6 +234,19 @@ class _AddAddressPageState extends State<AddAddressPage> {
             onPressed: () {
               setState(() {
                 _showForm = !_showForm;
+                if (!_showForm) {
+                  // Clear form when closing
+                  _isEditMode = false;
+                  _editingIndex = null;
+                  _deliveryAreaController.clear();
+                  _completeAddressController.clear();
+                  _contactNoController.clear();
+                  _deliveryInstructionsController.clear();
+                  _latitudeController.clear();
+                  _longitudeController.clear();
+                  _nicknameController.clear();
+                  _selectedNickname = 'Home';
+                }
               });
             },
             tooltip: _showForm ? 'Cancel' : 'Add Address',
@@ -521,9 +610,9 @@ class _AddAddressPageState extends State<AddAddressPage> {
                               strokeWidth: 2.5,
                             ),
                           )
-                        : const Text(
-                            'Save Address',
-                            style: TextStyle(
+                        : Text(
+                            _isEditMode ? 'Update Address' : 'Save Address',
+                            style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
                             ),
@@ -536,7 +625,11 @@ class _AddAddressPageState extends State<AddAddressPage> {
                 ),
               ),
             )
-          : _savedAddresses.isEmpty
+          : _isLoadingAddresses
+              ? const Center(
+                  child: CircularProgressIndicator(),
+                )
+              : _savedAddresses.isEmpty
               ? Center(
                   child: Padding(
                     padding: const EdgeInsets.all(40.0),
@@ -623,19 +716,10 @@ class _AddAddressPageState extends State<AddAddressPage> {
                                 ),
                                 const Spacer(),
                                 IconButton(
-                                  icon: const Icon(Icons.delete_outline),
-                                  color: Colors.red,
-                                  onPressed: () {
-                                    setState(() {
-                                      _savedAddresses.removeAt(index);
-                                    });
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text('Address deleted'),
-                                        duration: Duration(seconds: 2),
-                                      ),
-                                    );
-                                  },
+                                  icon: const Icon(Icons.edit_outlined),
+                                  color: colorScheme.primary,
+                                  onPressed: () => _editAddress(index),
+                                  tooltip: 'Edit Address',
                                 ),
                               ],
                             ),
