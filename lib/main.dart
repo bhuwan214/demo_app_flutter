@@ -7,6 +7,7 @@ import './pages/contact_us.dart';
 import './login_page.dart';
 import 'signup_page.dart';
 import 'package:demo_app/pages/add_addres.dart';
+import 'package:demo_app/pages/order_history.dart';
 
 void main() {
   runApp(const MyApp());
@@ -84,8 +85,10 @@ class _MyAppState extends State<MyApp> {
               onThemeChanged: _updateThemeMode,
             ),
         '/contact_us': (context) => const ContactPage(),
-        '/add_address': (context) => const AddAddressPage (),
-        '/password_reset': (context) => PasswordResetPage()
+        '/add_address': (context) => const AddAddressPage(),
+        '/add-address': (context) => const AddAddressPage(),
+        '/password_reset': (context) => PasswordResetPage(),
+        '/order-history': (context) => const OrderHistoryPage(),
       },
 
 

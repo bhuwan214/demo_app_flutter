@@ -177,7 +177,9 @@ class _ProfilePageState extends State<ProfilePage> {
           ListTile(
             leading: const Icon(Icons.history_outlined),
             title: const Text("Order History"),
-            onTap: () {},
+            onTap: () {
+              Navigator.pushNamed(context, '/order-history');
+            },
           ),
 
             ListTile(
