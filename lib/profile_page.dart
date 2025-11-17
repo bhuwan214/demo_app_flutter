@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
-// import 'widget/themetoggle.dart';
+import 'services/auth_service.dart';
+import 'pages/edit_profile_dialog.dart';
 
 class ProfilePage extends StatefulWidget {
   final ThemeMode themeMode;
@@ -19,67 +20,92 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   String? _profileImage;
-  String name = "Bhuwan Kathayat";
-  String email = "bhuwan@example.com";
-  String location = "Kathmandu, Nepal";
+  String name = "User";
+  String phoneNumber = "";
+  String email = "";
+  String firstName = "";
+  String lastName = "";
+  String username = "";
+  bool _isLoading = true;
 
-  Future<void> _pickProfileImage() async {
-    final ImagePicker picker = ImagePicker();
-    final XFile? picked = await picker.pickImage(source: ImageSource.gallery);
-    if (picked != null) {
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
+    setState(() => _isLoading = true);
+    
+    final userData = await AuthService.getUserData();
+    
+    if (userData != null) {
       setState(() {
-        _profileImage = picked.path;
+        firstName = userData['first_name'] ?? '';
+        lastName = userData['last_name'] ?? '';
+        username = userData['username'] ?? '';
+        name = '$firstName $lastName'.trim();
+        if (name.isEmpty) {
+          name = username.isNotEmpty ? username : (userData['display_name'] ?? 'User');
+        }
+        phoneNumber = userData['mobile_no'] ?? '';
+        email = userData['email'] ?? '';
+        _isLoading = false;
+      });
+    } else {
+      setState(() {
+        _isLoading = false;
       });
     }
   }
 
-  void _editProfileInfo() async {
-    String tempName = name;
-    String tempEmail = email;
-
-    final result = await showDialog<Map<String, String>>(
+  void _showEditProfileDialog() {
+    EditProfileDialog.show(
       context: context,
-      builder: (context) {
-        final nameController = TextEditingController(text: name);
-        final emailController = TextEditingController(text: email);
-
-        return AlertDialog(
-          title: const Text("Edit Profile"),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                decoration: const InputDecoration(labelText: "Name"),
-                controller: nameController,
-                onChanged: (value) => tempName = value,
-              ),
-              const SizedBox(height: 10),
-              TextField(
-                decoration: const InputDecoration(labelText: "Email"),
-                controller: emailController,
-                onChanged: (value) => tempEmail = value,
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text("Cancel"),
-            ),
-            ElevatedButton(
-              onPressed: () => Navigator.pop(context, {"name": tempName, "email": tempEmail}),
-              child: const Text("Save"),
-            ),
-          ],
-        );
+      firstName: firstName,
+      lastName: lastName,
+      username: username,
+      onProfileUpdated: (newFirstName, newLastName, newUsername) {
+        if (mounted) {
+          setState(() {
+            firstName = newFirstName;
+            lastName = newLastName;
+            username = newUsername;
+            name = '$firstName $lastName'.trim();
+            if (name.isEmpty) {
+              name = username.isNotEmpty ? username : 'User';
+            }
+          });
+        }
       },
     );
+  }
 
-    if (result != null) {
-      setState(() {
-        name = result["name"] ?? name;
-        email = result["email"] ?? email;
-      });
+  Future<void> _pickProfileImage() async {
+    try {
+      final ImagePicker picker = ImagePicker();
+      final XFile? picked = await picker.pickImage(
+        source: ImageSource.gallery,
+        maxWidth: 1024,
+        maxHeight: 1024,
+        imageQuality: 85,
+      );
+      
+      if (picked != null && mounted) {
+        setState(() {
+          _profileImage = picked.path;
+        });
+      }
+    } catch (e) {
+      print('Error picking image: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error selecting image: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
   }
 
@@ -94,7 +120,9 @@ class _ProfilePageState extends State<ProfilePage> {
         centerTitle: true,
         backgroundColor: theme.colorScheme.primaryContainer,
       ),
-      body: ListView(
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : ListView(
         padding: const EdgeInsets.all(16),
         children: [
           // Profile Image + Info
@@ -134,19 +162,68 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
                 const SizedBox(height: 12),
 
-                // Name & Email with edit button
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(name, style: theme.textTheme.titleLarge),
-                    IconButton(
-                      icon: const Icon(Icons.edit, size: 18),
-                      onPressed: _editProfileInfo,
-                    ),
-                  ],
+                // User Name
+                Text(
+                  name,
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                  textAlign: TextAlign.center,
                 ),
-                Text(email, style: theme.textTheme.bodyMedium),
-                const SizedBox(height: 10),
+                const SizedBox(height: 8),
+
+                // Phone Number
+                if (phoneNumber.isNotEmpty)
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.phone,
+                        size: 16,
+                        color: theme.colorScheme.onSurface.withOpacity(0.7),
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        phoneNumber,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: theme.colorScheme.onSurface.withOpacity(0.8),
+                        ),
+                      ),
+                    ],
+                  ),
+                
+                // Email
+                if (email.isNotEmpty) ...[
+                  const SizedBox(height: 4),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.email,
+                        size: 16,
+                        color: theme.colorScheme.onSurface.withOpacity(0.7),
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        email,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: theme.colorScheme.onSurface.withOpacity(0.8),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+                const SizedBox(height: 16),
+
+                // Edit Profile Button
+                ElevatedButton.icon(
+                  onPressed: _showEditProfileDialog,
+                  icon: const Icon(Icons.edit),
+                  label: const Text('Edit Profile'),
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  ),
+                ),
               ],
             ),
           ),
@@ -182,14 +259,13 @@ class _ProfilePageState extends State<ProfilePage> {
             },
           ),
 
-            ListTile(
+          ListTile(
             leading: const Icon(Icons.add_location_alt_sharp),
             title: const Text("Add Delivery Location"),
             onTap: () {
               Navigator.pushNamed(context, '/add_address');
             },
           ),
-
 
           ListTile(
             leading: const Icon(Icons.lock_outline),
@@ -213,7 +289,6 @@ class _ProfilePageState extends State<ProfilePage> {
             },
           ),
 
-        
           const Divider(),
           const SizedBox(height: 10),
 
@@ -224,27 +299,35 @@ class _ProfilePageState extends State<ProfilePage> {
               // Show confirmation dialog
               showDialog(
                 context: context,
-                builder: (context) => AlertDialog(
+                builder: (dialogContext) => AlertDialog(
                   title: const Text('Logout'),
                   content: const Text('Are you sure you want to logout?'),
                   actions: [
                     TextButton(
-                      onPressed: () => Navigator.pop(context),
+                      onPressed: () => Navigator.pop(dialogContext),
                       child: const Text('Cancel'),
                     ),
                     ElevatedButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                        // Add your logout logic here
-                        Navigator.pushNamed(context, '/login');
+                      onPressed: () async {
+                        Navigator.pop(dialogContext);
+                        // Clear auth data
+                        await AuthService.clearAuth();
+                        if (!context.mounted) return;
+                        Navigator.pushReplacementNamed(context, '/login');
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Logged out successfully'),duration:Duration(seconds: 1) ,),
+                          const SnackBar(
+                            content: Text('Logged out successfully'),
+                            duration: Duration(seconds: 1),
+                          ),
                         );
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.red,
                       ),
-                      child: const Text('Logout', style: TextStyle(color: Color.fromARGB(255, 241, 238, 238))),
+                      child: const Text(
+                        'Logout',
+                        style: TextStyle(color: Color.fromARGB(255, 241, 238, 238)),
+                      ),
                     ),
                   ],
                 ),

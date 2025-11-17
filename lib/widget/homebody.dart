@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../grid.dart';
 import 'package:demo_app/widget/search_field.dart';
+import '../services/auth_service.dart';
 
 class HomeBody extends StatefulWidget {
   const HomeBody({super.key});
@@ -12,9 +13,60 @@ class HomeBody extends StatefulWidget {
 }
 
 class _HomeBodyState extends State<HomeBody> {
-    final TextEditingController _searchController = TextEditingController();
+  final TextEditingController _searchController = TextEditingController();
+  String _userName = 'Guest';
+  bool _isLoadingUser = true;
 
-    @override
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
+    try {
+      final userData = await AuthService.getUserData();
+      if (userData != null && mounted) {
+        setState(() {
+          // Try different possible field names for the user's name
+          _userName = userData['first_name']?.toString() ?? 
+                      userData['name']?.toString() ?? 
+                      userData['username']?.toString() ?? 
+                      'Guest';
+          _isLoadingUser = false;
+        });
+      } else {
+        if (mounted) {
+          setState(() {
+            _userName = 'Guest';
+            _isLoadingUser = false;
+          });
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _userName = 'Guest';
+          _isLoadingUser = false;
+        });
+      }
+    }
+  }
+
+  String _getTimeBasedGreeting() {
+    final hour = DateTime.now().hour;
+    if (hour >= 5 && hour < 12) {
+      return 'Good Morning';
+    } else if (hour >= 12 && hour < 17) {
+      return 'Good Afternoon';
+    } else if (hour >= 17 && hour < 21) {
+      return 'Good Evening';
+    } else {
+      return 'Good Night';
+    }
+  }
+
+  @override
   void dispose() {
     _searchController.dispose();
     super.dispose();
@@ -42,27 +94,41 @@ class _HomeBodyState extends State<HomeBody> {
                       child: Icon(Icons.person, color: colorScheme.onPrimary),
                     ),
                     const SizedBox(width: 12),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Hello Alex',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: colorScheme.onSurface.withOpacity(0.6),
+                    _isLoadingUser
+                        ? const Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                SizedBox(
+                                  height: 14,
+                                  width: 80,
+                                  child: LinearProgressIndicator(),
+                                ),
+                              ],
+                            ),
+                          )
+                        : Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Hello $_userName',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: colorScheme.onSurface.withOpacity(0.6),
+                                  ),
+                                ),
+                                Text(
+                                  '${_getTimeBasedGreeting()}!',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: colorScheme.onSurface,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                        Text(
-                          'Good Morning!',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: colorScheme.onSurface,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const Spacer(),
                     IconButton(
                       icon: Icon(Icons.notifications_outlined, color: colorScheme.onSurface),
                       onPressed: () {},
