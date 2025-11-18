@@ -22,6 +22,7 @@ class _MyLoginState extends State<MyLogin> {
   final TextEditingController _userNameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _isLoading = false;
+  bool _obscurePassword = true;
 
   // 🧠 LOGIN FUNCTION
   Future<void> _loginUser() async {
@@ -225,7 +226,7 @@ class _MyLoginState extends State<MyLogin> {
                             // Password Field
                             TextFormField(
                               controller: _passwordController,
-                              obscureText: true,
+                              obscureText: _obscurePassword,
                               style: TextStyle(color: colorScheme.onSurface),
                               decoration: InputDecoration(
                                 fillColor: isDarkMode
@@ -239,6 +240,19 @@ class _MyLoginState extends State<MyLogin> {
                                 prefixIcon: Icon(
                                   Icons.lock_outline,
                                   color: colorScheme.primary,
+                                ),
+                                suffixIcon: IconButton(
+                                  icon: Icon(
+                                    _obscurePassword
+                                        ? Icons.visibility_off
+                                        : Icons.visibility,
+                                    color: colorScheme.onSurface.withOpacity(0.6),
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      _obscurePassword = !_obscurePassword;
+                                    });
+                                  },
                                 ),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),

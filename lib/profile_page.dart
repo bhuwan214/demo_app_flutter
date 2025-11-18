@@ -124,9 +124,7 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
-  // ----------------------------------
-  // POPUP EDIT MENU (CENTER DIALOG)
-  // ----------------------------------
+
   void _openEditPopup() {
     showDialog(
       context: context,
@@ -185,146 +183,146 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  // ----------------------------------
-  // MAIN UI
-  // ----------------------------------
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDarkMode = widget.themeMode == ThemeMode.dark;
 
-    return Scaffold(
-    
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : ListView(
-              padding: const EdgeInsets.all(16),
-              children: [
-                Center(
-                  child: Column(
-                    children: [
-                      // PROFILE PHOTO
-                      Stack(
-                        children: [
-                          CircleAvatar(
-                            radius: 50,
-                            backgroundImage: _profileImage != null
-                                ? FileImage(File(_profileImage!))
-                                : null,
-                            child: _profileImage == null
-                                ? const Icon(Icons.person, size: 50)
-                                : null,
-                          ),
-                          Positioned(
-                            bottom: 0,
-                            right: 4,
-                            child: CircleAvatar(
-                              backgroundColor: theme.colorScheme.primary,
-                              radius: 18,
-                              child: IconButton(
-                                icon: const Icon(Icons.camera_alt,
-                                    color: Colors.white, size: 18),
-                                onPressed: _pickProfileImage,
-                                padding: EdgeInsets.zero,
-                              ),
+    return SafeArea(
+      child: Scaffold(
+      
+        body: _isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : ListView(
+                padding: const EdgeInsets.all(16),
+                children: [
+                  Center(
+                    child: Column(
+                      children: [
+                        // PROFILE PHOTO
+                        Stack(
+                          children: [
+                            CircleAvatar(
+                              radius: 50,
+                              backgroundImage: _profileImage != null
+                                  ? FileImage(File(_profileImage!))
+                                  : null,
+                              child: _profileImage == null
+                                  ? const Icon(Icons.person, size: 50)
+                                  : null,
                             ),
-                          )
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-
-                      Text(
-                        "$firstName $lastName".trim().isNotEmpty 
-                            ? "$firstName $lastName".trim() 
-                            : "User",
-                        style: theme.textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
+                            Positioned(
+                              bottom: 0,
+                              right: 4,
+                              child: CircleAvatar(
+                                backgroundColor: theme.colorScheme.primary,
+                                radius: 18,
+                                child: IconButton(
+                                  icon: const Icon(Icons.camera_alt,
+                                      color: Colors.white, size: 18),
+                                  onPressed: _pickProfileImage,
+                                  padding: EdgeInsets.zero,
+                                ),
+                              ),
+                            )
+                          ],
                         ),
-                      ),
-
-                      if (phoneNumber.isNotEmpty)
-                        Text(phoneNumber,
-                            style: TextStyle(
-                                color:
-                                    theme.colorScheme.onSurface.withOpacity(0.6))),
-
-                      const SizedBox(height: 14),
-
-                      ElevatedButton.icon(
-                        onPressed: _openEditPopup,
-                        icon: const Icon(Icons.edit),
-                        label: const Text("Edit Profile"),
-                      ),
-                    ],
+                        const SizedBox(height: 12),
+      
+                        Text(
+                          "$firstName $lastName".trim().isNotEmpty 
+                              ? "$firstName $lastName".trim() 
+                              : "User",
+                          style: theme.textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+      
+                        if (phoneNumber.isNotEmpty)
+                          Text(phoneNumber,
+                              style: TextStyle(
+                                  color:
+                                      theme.colorScheme.onSurface.withOpacity(0.6))),
+      
+                        const SizedBox(height: 14),
+      
+                        ElevatedButton.icon(
+                          onPressed: _openEditPopup,
+                          icon: const Icon(Icons.edit),
+                          label: const Text("Edit Profile"),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-
-                const SizedBox(height: 20),
-                const Divider(),
-                const SizedBox(height: 10),
-
-                // ------------------------------
-                // OLD LISTTILES RESTORED
-                // ------------------------------
-
-                ListTile(
-                  leading: Icon(isDarkMode ? Icons.dark_mode : Icons.light_mode),
-                  title: const Text("Theme"),
-                  subtitle: Text(isDarkMode ? "Dark Mode" : "Light Mode"),
-                  trailing: Switch.adaptive(
-                    value: isDarkMode,
-                    onChanged: (value) {
-                      widget.onThemeChanged(
-                          value ? ThemeMode.dark : ThemeMode.light);
+      
+                  const SizedBox(height: 20),
+                  const Divider(),
+                  const SizedBox(height: 10),
+      
+                  // ------------------------------
+                  // OLD LISTTILES RESTORED
+                  // ------------------------------
+      
+                  ListTile(
+                    leading: Icon(isDarkMode ? Icons.dark_mode : Icons.light_mode),
+                    title: const Text("Theme"),
+                    subtitle: Text(isDarkMode ? "Dark Mode" : "Light Mode"),
+                    trailing: Switch.adaptive(
+                      value: isDarkMode,
+                      onChanged: (value) {
+                        widget.onThemeChanged(
+                            value ? ThemeMode.dark : ThemeMode.light);
+                      },
+                    ),
+                  ),
+      
+                  const Divider(),
+      
+                  ListTile(
+                    leading: const Icon(Icons.history_outlined),
+                    title: const Text("Order History"),
+                    onTap: () => Navigator.pushNamed(context, '/order-history'),
+                  ),
+      
+                  ListTile(
+                    leading: const Icon(Icons.add_location_alt_sharp),
+                    title: const Text("Add Delivery Location"),
+                    onTap: () => Navigator.pushNamed(context, '/add_address'),
+                  ),
+      
+                  ListTile(
+                    leading: const Icon(Icons.lock_outline),
+                    title: const Text("Change Password"),
+                    onTap: () => Navigator.pushNamed(context, '/password_reset'),
+                  ),
+      
+                  ListTile(
+                    leading: const Icon(Icons.settings_outlined),
+                    title: const Text("Settings"),
+                  ),
+      
+                  ListTile(
+                    leading: const Icon(Icons.support_agent),
+                    title: const Text("Contact Us"),
+                    onTap: () => Navigator.pushNamed(context, '/contact_us'),
+                  ),
+      
+                  const Divider(),
+      
+                  ListTile(
+                    leading: const Icon(Icons.logout, color: Colors.red),
+                    title: const Text("Logout",
+                        style: TextStyle(color: Colors.red)),
+                    onTap: () async {
+                      await AuthService.clearAuth();
+                      if (!mounted) return;
+                      Navigator.pushReplacementNamed(context, '/login');
                     },
                   ),
-                ),
-
-                const Divider(),
-
-                ListTile(
-                  leading: const Icon(Icons.history_outlined),
-                  title: const Text("Order History"),
-                  onTap: () => Navigator.pushNamed(context, '/order-history'),
-                ),
-
-                ListTile(
-                  leading: const Icon(Icons.add_location_alt_sharp),
-                  title: const Text("Add Delivery Location"),
-                  onTap: () => Navigator.pushNamed(context, '/add_address'),
-                ),
-
-                ListTile(
-                  leading: const Icon(Icons.lock_outline),
-                  title: const Text("Change Password"),
-                  onTap: () => Navigator.pushNamed(context, '/password_reset'),
-                ),
-
-                ListTile(
-                  leading: const Icon(Icons.settings_outlined),
-                  title: const Text("Settings"),
-                ),
-
-                ListTile(
-                  leading: const Icon(Icons.support_agent),
-                  title: const Text("Contact Us"),
-                  onTap: () => Navigator.pushNamed(context, '/contact_us'),
-                ),
-
-                const Divider(),
-
-                ListTile(
-                  leading: const Icon(Icons.logout, color: Colors.red),
-                  title: const Text("Logout",
-                      style: TextStyle(color: Colors.red)),
-                  onTap: () async {
-                    await AuthService.clearAuth();
-                    if (!mounted) return;
-                    Navigator.pushReplacementNamed(context, '/login');
-                  },
-                ),
-              ],
-            ),
+                ],
+              ),
+      ),
     );
   }
 }

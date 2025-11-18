@@ -79,159 +79,161 @@ class _HomeBodyState extends State<HomeBody> {
     final colorScheme = theme.colorScheme;
     final isDark = theme.brightness == Brightness.dark;
 
-    return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-                // Header with profile
-                Row(
-                  children: [
-                    CircleAvatar(
-                      radius: 25,
-                      backgroundColor: colorScheme.primary,
-                      child: Icon(Icons.person, color: colorScheme.onPrimary),
-                    ),
-                    const SizedBox(width: 12),
-                    _isLoadingUser
-                        ? const Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                SizedBox(
-                                  height: 14,
-                                  width: 80,
-                                  child: LinearProgressIndicator(),
-                                ),
-                              ],
-                            ),
-                          )
-                        : Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Hello $_userName',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: colorScheme.onSurface.withOpacity(0.6),
+    return SafeArea(
+      child: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+                  // Header with profile
+                  Row(
+                    children: [
+                      CircleAvatar(
+                        radius: 25,
+                        backgroundColor: colorScheme.primary,
+                        child: Icon(Icons.person, color: colorScheme.onPrimary),
+                      ),
+                      const SizedBox(width: 12),
+                      _isLoadingUser
+                          ? const Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  SizedBox(
+                                    height: 14,
+                                    width: 80,
+                                    child: LinearProgressIndicator(),
                                   ),
-                                ),
+                                ],
+                              ),
+                            )
+                          : Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Hello $_userName',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: colorScheme.onSurface.withOpacity(0.6),
+                                    ),
+                                  ),
+                                  Text(
+                                    '${_getTimeBasedGreeting()}!',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: colorScheme.onSurface,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                      IconButton(
+                        icon: Icon(Icons.notifications_outlined, color: colorScheme.onSurface),
+                        onPressed: () {},
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.shopping_bag_outlined, color: colorScheme.onSurface),
+                        onPressed: () {},
+                      ),
+                    ],
+                  ),
+                  // const SizedBox(height: 10),
+      
+                     SearchTextField(
+              controller: _searchController,
+              hintText: 'Search products...',
+              onChanged: (value) {
+                              setState(() {});
+              },
+              onClear: () {
+      
+               setState(() {});
+              },
+            ),
+      
+              
+      
+                  // Category Chips
+                  // SingleChildScrollView(
+                  //   scrollDirection: Axis.horizontal,
+                  //   child: Row(
+                  //     children: [
+                  //       _CategoryChip(label: 'All', isSelected: true),
+                  //       _CategoryChip(label: 'Men', isSelected: false),
+                  //       _CategoryChip(label: 'Women', isSelected: false),
+                  //       _CategoryChip(label: 'Girls', isSelected: false),
+                  //     ],
+                  //   ),
+                  // ),
+                  // const SizedBox(height: 20),
+      
+                  // Promotional Banner
+                  Container(
+                    height: 150,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: isDark
+                            ? [colorScheme.primaryContainer, colorScheme.primary]
+                            : [const Color(0xFFFF8A5B), const Color(0xFFFF6B3D)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(25, 12, 25, 10),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
                                 Text(
-                                  '${_getTimeBasedGreeting()}!',
+                                  'Get Your\nSpecial Sale\nUp to 40%',
                                   style: TextStyle(
-                                    fontSize: 16,
+                                    color: isDark ? colorScheme.onPrimaryContainer : Colors.white,
+                                    fontSize: 20,
                                     fontWeight: FontWeight.bold,
-                                    color: colorScheme.onSurface,
+                                    height: 1.2,
                                   ),
+                                ),
+                                const SizedBox(height: 6),
+                                ElevatedButton(
+                                  onPressed: () {},
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: isDark ? colorScheme.surface : Colors.white,
+                                    foregroundColor: isDark ? colorScheme.primary : const Color(0xFFFF6B3D),
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 1),
+                                  ),
+                                  child: const Text('Shop Now' ,style: TextStyle(fontSize:12),),
                                 ),
                               ],
                             ),
                           ),
-                    IconButton(
-                      icon: Icon(Icons.notifications_outlined, color: colorScheme.onSurface),
-                      onPressed: () {},
-                    ),
-                    IconButton(
-                      icon: Icon(Icons.shopping_bag_outlined, color: colorScheme.onSurface),
-                      onPressed: () {},
-                    ),
-                  ],
-                ),
-                // const SizedBox(height: 10),
-
-                   SearchTextField(
-            controller: _searchController,
-            hintText: 'Search products...',
-            onChanged: (value) {
-                            setState(() {});
-            },
-            onClear: () {
-
-             setState(() {});
-            },
-          ),
-
-            
-
-                // Category Chips
-                // SingleChildScrollView(
-                //   scrollDirection: Axis.horizontal,
-                //   child: Row(
-                //     children: [
-                //       _CategoryChip(label: 'All', isSelected: true),
-                //       _CategoryChip(label: 'Men', isSelected: false),
-                //       _CategoryChip(label: 'Women', isSelected: false),
-                //       _CategoryChip(label: 'Girls', isSelected: false),
-                //     ],
-                //   ),
-                // ),
-                // const SizedBox(height: 20),
-
-                // Promotional Banner
-                Container(
-                  height: 150,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: isDark
-                          ? [colorScheme.primaryContainer, colorScheme.primary]
-                          : [const Color(0xFFFF8A5B), const Color(0xFFFF6B3D)],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(25, 12, 25, 10),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                'Get Your\nSpecial Sale\nUp to 40%',
-                                style: TextStyle(
-                                  color: isDark ? colorScheme.onPrimaryContainer : Colors.white,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                  height: 1.2,
-                                ),
-                              ),
-                              const SizedBox(height: 10),
-                              ElevatedButton(
-                                onPressed: () {},
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: isDark ? colorScheme.surface : Colors.white,
-                                  foregroundColor: isDark ? colorScheme.primary : const Color(0xFFFF6B3D),
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 1),
-                                ),
-                                child: const Text('Shop Now' ,style: TextStyle(fontSize:12),),
-                              ),
-                            ],
+                          Icon(
+                            Icons.shopping_bag,
+                            size: 80,
+                            color: isDark
+                                ? colorScheme.onPrimaryContainer.withOpacity(0.2)
+                                : Colors.white.withOpacity(0.3),
                           ),
-                        ),
-                        Icon(
-                          Icons.shopping_bag,
-                          size: 80,
-                          color: isDark
-                              ? colorScheme.onPrimaryContainer.withOpacity(0.2)
-                              : Colors.white.withOpacity(0.3),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(height: 14),
-
-                const PopularProduct(),
-              ],
+                  const SizedBox(height: 14),
+      
+                  const PopularProduct(),
+                ],
+              ),
             ),
           ),
-        );
+    );
   }
 }
 

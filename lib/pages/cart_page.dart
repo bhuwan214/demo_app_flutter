@@ -128,8 +128,8 @@ class _CartPageState extends State<CartPage> {
                               child: item.imageUrl.startsWith('http')
                                   ? Image.network(
                                       item.imageUrl,
-                                      width: 48,
-                                      height: 48,
+                                      width: 47,
+                                      height: 50,
                                       fit: BoxFit.cover,
                                       errorBuilder:
                                           (context, error, stackTrace) =>
@@ -159,19 +159,24 @@ class _CartPageState extends State<CartPage> {
                                 Text(
                                   'Rs ${item.price}',
                                   style: const TextStyle(
+                                    
                                     fontWeight: FontWeight.bold,
                                     color: Colors.green,
                                   ),
                                 ),
-                                const SizedBox(width: 0),
+                                // const SizedBox(width: 0),
+                                
                                 IconButton(
                                   padding: EdgeInsets.zero,
                                   constraints: const BoxConstraints.tightFor(
-                                    width: 24,
-                                    height: 24,
+                                    width: 20,
+                                    height: 20,
+                                
+                                    
                                   ),
                                   iconSize: 16,
-                                  splashRadius: 16,
+                                  splashRadius: 30,
+                                  
                                   icon: const Icon(Icons.remove),
                                   onPressed: () {
                                     if (item.quantity > 1) {
@@ -187,7 +192,9 @@ class _CartPageState extends State<CartPage> {
                                   child: Center(
                                     child: Text(
                                       item.quantity.toString(),
-                                      style: const TextStyle(fontSize: 14),
+                                      style: const TextStyle(fontSize: 12, backgroundColor: Colors.red),
+
+                                      maxLines: 2,
                                     ),
                                   ),
                                 ),
