@@ -125,69 +125,61 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   // ----------------------------------
-  // POPUP EDIT MENU
+  // POPUP EDIT MENU (CENTER DIALOG)
   // ----------------------------------
   void _openEditPopup() {
-    showModalBottomSheet(
+    showDialog(
       context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
       builder: (context) {
-        return Padding(
-          padding: EdgeInsets.only(
-            bottom: MediaQuery.of(context).viewInsets.bottom + 16,
-            left: 16,
-            right: 16,
-            top: 20,
+        return AlertDialog(
+          title: const Text("Edit Profile",
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // FIRST NAME
+                TextField(
+                  controller: _firstController,
+                  decoration: const InputDecoration(
+                    labelText: "First Name",
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 12),
+
+                // LAST NAME
+                TextField(
+                  controller: _lastController,
+                  decoration: const InputDecoration(
+                    labelText: "Last Name",
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 12),
+
+                // USERNAME
+                TextField(
+                  controller: _userController,
+                  decoration: const InputDecoration(
+                    labelText: "Username",
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+              ],
+            ),
           ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text("Edit Profile",
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 16),
-
-              // FIRST NAME
-              TextField(
-                controller: _firstController,
-                decoration: const InputDecoration(
-                  labelText: "First Name",
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 12),
-
-              // LAST NAME
-              TextField(
-                controller: _lastController,
-                decoration: const InputDecoration(
-                  labelText: "Last Name",
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 12),
-
-              // USERNAME
-              TextField(
-                controller: _userController,
-                decoration: const InputDecoration(
-                  labelText: "Username",
-                  border: OutlineInputBorder(),
-                ),
-              ),
-
-              const SizedBox(height: 20),
-
-              // SAVE BUTTON
-              ElevatedButton(
-                onPressed: updateProfile,
-                child: const Text("Save Changes"),
-              ),
-              const SizedBox(height: 10),
-            ],
-          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("Cancel"),
+            ),
+            ElevatedButton(
+              onPressed: updateProfile,
+              child: const Text("Save Changes"),
+            ),
+          ],
         );
       },
     );
@@ -202,10 +194,7 @@ class _ProfilePageState extends State<ProfilePage> {
     final isDarkMode = widget.themeMode == ThemeMode.dark;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Profile Page"),
-        centerTitle: true,
-      ),
+    
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : ListView(
@@ -245,16 +234,19 @@ class _ProfilePageState extends State<ProfilePage> {
                       const SizedBox(height: 12),
 
                       Text(
-                        "$firstName $lastName",
+                        "$firstName $lastName".trim().isNotEmpty 
+                            ? "$firstName $lastName".trim() 
+                            : "User",
                         style: theme.textTheme.titleLarge?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
                       ),
 
-                      Text("@$username",
-                          style: TextStyle(
-                              color:
-                                  theme.colorScheme.onSurface.withOpacity(0.6))),
+                      if (phoneNumber.isNotEmpty)
+                        Text(phoneNumber,
+                            style: TextStyle(
+                                color:
+                                    theme.colorScheme.onSurface.withOpacity(0.6))),
 
                       const SizedBox(height: 14),
 
