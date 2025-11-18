@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'services/auth_service.dart';
-import 'pages/edit_profile_dialog.dart';
+import 'package:http/http.dart' as http;
 
 class ProfilePage extends StatefulWidget {
   final ThemeMode themeMode;
@@ -20,13 +20,18 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   String? _profileImage;
-  String name = "User";
-  String phoneNumber = "";
-  String email = "";
+
   String firstName = "";
   String lastName = "";
   String username = "";
+  String phoneNumber = "";
+  String email = "";
+
   bool _isLoading = true;
+
+  final TextEditingController _firstController = TextEditingController();
+  final TextEditingController _lastController = TextEditingController();
+  final TextEditingController _userController = TextEditingController();
 
   @override
   void initState() {
@@ -36,79 +41,161 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Future<void> _loadUserData() async {
     setState(() => _isLoading = true);
-    
+
     final userData = await AuthService.getUserData();
-    
+
     if (userData != null) {
+      firstName = userData["first_name"] ?? "";
+      lastName = userData["last_name"] ?? "";
+      username = userData["username"] ?? "";
+      phoneNumber = userData["mobile_no"] ?? "";
+      email = userData["email"] ?? "";
+
+      _firstController.text = firstName;
+      _lastController.text = lastName;
+      _userController.text = username;
+    }
+
+    setState(() => _isLoading = false);
+  }
+
+  // -------------------------------
+  // UPDATE PROFILE API CALL
+  // -------------------------------
+  Future<void> updateProfile() async {
+    Navigator.pop(context); // Close popup
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Saving..."), duration: Duration(seconds: 1)),
+    );
+
+    final token = await AuthService.getToken();
+    if (token == null) return;
+
+    final url = Uri.parse(
+      "https://ecommerce.atithyahms.com/api/ecommerce/customer/profile/edit",
+    );
+
+    final body = {
+      "first_name": _firstController.text,
+      "last_name": _lastController.text,
+      "username": _userController.text,
+      "email": email,
+    };
+
+    final response = await http.post(
+      url,
+      headers: {"Authorization": "Bearer $token"},
+      body: body,
+    );
+
+    if (response.statusCode == 200) {
       setState(() {
-        firstName = userData['first_name'] ?? '';
-        lastName = userData['last_name'] ?? '';
-        username = userData['username'] ?? '';
-        name = '$firstName $lastName'.trim();
-        if (name.isEmpty) {
-          name = username.isNotEmpty ? username : (userData['display_name'] ?? 'User');
-        }
-        phoneNumber = userData['mobile_no'] ?? '';
-        email = userData['email'] ?? '';
-        _isLoading = false;
+        firstName = _firstController.text;
+        lastName = _lastController.text;
+        username = _userController.text;
       });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Profile updated successfully!"),
+          duration: Duration(seconds: 2),
+        ),
+      );
     } else {
-      setState(() {
-        _isLoading = false;
-      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Failed: ${response.body}"),
+          duration: const Duration(seconds: 2),
+        ),
+      );
     }
   }
 
-  void _showEditProfileDialog() {
-    EditProfileDialog.show(
+  // ----------------------------------
+  // IMAGE PICKER
+  // ----------------------------------
+  Future<void> _pickProfileImage() async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? picked = await picker.pickImage(source: ImageSource.gallery);
+
+    if (picked != null) {
+      setState(() => _profileImage = picked.path);
+    }
+  }
+
+  // ----------------------------------
+  // POPUP EDIT MENU
+  // ----------------------------------
+  void _openEditPopup() {
+    showModalBottomSheet(
       context: context,
-      firstName: firstName,
-      lastName: lastName,
-      username: username,
-      onProfileUpdated: (newFirstName, newLastName, newUsername) {
-        if (mounted) {
-          setState(() {
-            firstName = newFirstName;
-            lastName = newLastName;
-            username = newUsername;
-            name = '$firstName $lastName'.trim();
-            if (name.isEmpty) {
-              name = username.isNotEmpty ? username : 'User';
-            }
-          });
-        }
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom + 16,
+            left: 16,
+            right: 16,
+            top: 20,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text("Edit Profile",
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 16),
+
+              // FIRST NAME
+              TextField(
+                controller: _firstController,
+                decoration: const InputDecoration(
+                  labelText: "First Name",
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 12),
+
+              // LAST NAME
+              TextField(
+                controller: _lastController,
+                decoration: const InputDecoration(
+                  labelText: "Last Name",
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 12),
+
+              // USERNAME
+              TextField(
+                controller: _userController,
+                decoration: const InputDecoration(
+                  labelText: "Username",
+                  border: OutlineInputBorder(),
+                ),
+              ),
+
+              const SizedBox(height: 20),
+
+              // SAVE BUTTON
+              ElevatedButton(
+                onPressed: updateProfile,
+                child: const Text("Save Changes"),
+              ),
+              const SizedBox(height: 10),
+            ],
+          ),
+        );
       },
     );
   }
 
-  Future<void> _pickProfileImage() async {
-    try {
-      final ImagePicker picker = ImagePicker();
-      final XFile? picked = await picker.pickImage(
-        source: ImageSource.gallery,
-        maxWidth: 1024,
-        maxHeight: 1024,
-        imageQuality: 85,
-      );
-      
-      if (picked != null && mounted) {
-        setState(() {
-          _profileImage = picked.path;
-        });
-      }
-    } catch (e) {
-      print('Error picking image: $e');
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error selecting image: ${e.toString()}'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-    }
-  }
-
+  // ----------------------------------
+  // MAIN UI
+  // ----------------------------------
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -118,224 +205,134 @@ class _ProfilePageState extends State<ProfilePage> {
       appBar: AppBar(
         title: const Text("Profile Page"),
         centerTitle: true,
-        backgroundColor: theme.colorScheme.primaryContainer,
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          // Profile Image + Info
-          Center(
-            child: Column(
+              padding: const EdgeInsets.all(16),
               children: [
-                Stack(
-                  children: [
-                    CircleAvatar(
-                      radius: 50,
-                      backgroundColor: theme.colorScheme.primaryContainer,
-                      backgroundImage: _profileImage != null
-                          ? FileImage(File(_profileImage!))
-                          : null,
-                      child: _profileImage == null
-                          ? Icon(
-                              Icons.person,
-                              size: 50,
-                              color: theme.colorScheme.onPrimaryContainer,
-                            )
-                          : null,
-                    ),
-                    Positioned(
-                      bottom: 0,
-                      right: 4,
-                      child: CircleAvatar(
-                        backgroundColor: theme.colorScheme.primary,
-                        radius: 18,
-                        child: IconButton(
-                          icon: const Icon(Icons.camera_alt, color: Colors.white, size: 18),
-                          onPressed: _pickProfileImage,
-                          padding: EdgeInsets.zero,
-                        ),
-                      ),
-                    )
-                  ],
-                ),
-                const SizedBox(height: 12),
-
-                // User Name
-                Text(
-                  name,
-                  style: theme.textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 8),
-
-                // Phone Number
-                if (phoneNumber.isNotEmpty)
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                Center(
+                  child: Column(
                     children: [
-                      Icon(
-                        Icons.phone,
-                        size: 16,
-                        color: theme.colorScheme.onSurface.withOpacity(0.7),
+                      // PROFILE PHOTO
+                      Stack(
+                        children: [
+                          CircleAvatar(
+                            radius: 50,
+                            backgroundImage: _profileImage != null
+                                ? FileImage(File(_profileImage!))
+                                : null,
+                            child: _profileImage == null
+                                ? const Icon(Icons.person, size: 50)
+                                : null,
+                          ),
+                          Positioned(
+                            bottom: 0,
+                            right: 4,
+                            child: CircleAvatar(
+                              backgroundColor: theme.colorScheme.primary,
+                              radius: 18,
+                              child: IconButton(
+                                icon: const Icon(Icons.camera_alt,
+                                    color: Colors.white, size: 18),
+                                onPressed: _pickProfileImage,
+                                padding: EdgeInsets.zero,
+                              ),
+                            ),
+                          )
+                        ],
                       ),
-                      const SizedBox(width: 6),
+                      const SizedBox(height: 12),
+
                       Text(
-                        phoneNumber,
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: theme.colorScheme.onSurface.withOpacity(0.8),
+                        "$firstName $lastName",
+                        style: theme.textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
                         ),
+                      ),
+
+                      Text("@$username",
+                          style: TextStyle(
+                              color:
+                                  theme.colorScheme.onSurface.withOpacity(0.6))),
+
+                      const SizedBox(height: 14),
+
+                      ElevatedButton.icon(
+                        onPressed: _openEditPopup,
+                        icon: const Icon(Icons.edit),
+                        label: const Text("Edit Profile"),
                       ),
                     ],
                   ),
-                
-                // Email
-                if (email.isNotEmpty) ...[
-                  const SizedBox(height: 4),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.email,
-                        size: 16,
-                        color: theme.colorScheme.onSurface.withOpacity(0.7),
-                      ),
-                      const SizedBox(width: 6),
-                      Text(
-                        email,
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: theme.colorScheme.onSurface.withOpacity(0.8),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-                const SizedBox(height: 16),
+                ),
 
-                // Edit Profile Button
-                ElevatedButton.icon(
-                  onPressed: _showEditProfileDialog,
-                  icon: const Icon(Icons.edit),
-                  label: const Text('Edit Profile'),
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                const SizedBox(height: 20),
+                const Divider(),
+                const SizedBox(height: 10),
+
+                // ------------------------------
+                // OLD LISTTILES RESTORED
+                // ------------------------------
+
+                ListTile(
+                  leading: Icon(isDarkMode ? Icons.dark_mode : Icons.light_mode),
+                  title: const Text("Theme"),
+                  subtitle: Text(isDarkMode ? "Dark Mode" : "Light Mode"),
+                  trailing: Switch.adaptive(
+                    value: isDarkMode,
+                    onChanged: (value) {
+                      widget.onThemeChanged(
+                          value ? ThemeMode.dark : ThemeMode.light);
+                    },
                   ),
+                ),
+
+                const Divider(),
+
+                ListTile(
+                  leading: const Icon(Icons.history_outlined),
+                  title: const Text("Order History"),
+                  onTap: () => Navigator.pushNamed(context, '/order-history'),
+                ),
+
+                ListTile(
+                  leading: const Icon(Icons.add_location_alt_sharp),
+                  title: const Text("Add Delivery Location"),
+                  onTap: () => Navigator.pushNamed(context, '/add_address'),
+                ),
+
+                ListTile(
+                  leading: const Icon(Icons.lock_outline),
+                  title: const Text("Change Password"),
+                  onTap: () => Navigator.pushNamed(context, '/password_reset'),
+                ),
+
+                ListTile(
+                  leading: const Icon(Icons.settings_outlined),
+                  title: const Text("Settings"),
+                ),
+
+                ListTile(
+                  leading: const Icon(Icons.support_agent),
+                  title: const Text("Contact Us"),
+                  onTap: () => Navigator.pushNamed(context, '/contact_us'),
+                ),
+
+                const Divider(),
+
+                ListTile(
+                  leading: const Icon(Icons.logout, color: Colors.red),
+                  title: const Text("Logout",
+                      style: TextStyle(color: Colors.red)),
+                  onTap: () async {
+                    await AuthService.clearAuth();
+                    if (!mounted) return;
+                    Navigator.pushReplacementNamed(context, '/login');
+                  },
                 ),
               ],
             ),
-          ),
-
-          const SizedBox(height: 20),
-          const Divider(),
-          const SizedBox(height: 10),
-
-          // Theme Toggle as ListTile
-          ListTile(
-            leading: Icon(
-              isDarkMode ? Icons.dark_mode : Icons.light_mode,
-            ),
-            title: const Text("Theme"),
-            subtitle: Text(isDarkMode ? "Dark Mode" : "Light Mode"),
-            trailing: Switch.adaptive(
-              value: isDarkMode,
-              onChanged: (value) {
-                widget.onThemeChanged(value ? ThemeMode.dark : ThemeMode.light);
-              },
-            ),
-          ),
-
-          const Divider(),
-          const SizedBox(height: 10),
-
-          // Order History Section
-          ListTile(
-            leading: const Icon(Icons.history_outlined),
-            title: const Text("Order History"),
-            onTap: () {
-              Navigator.pushNamed(context, '/order-history');
-            },
-          ),
-
-          ListTile(
-            leading: const Icon(Icons.add_location_alt_sharp),
-            title: const Text("Add Delivery Location"),
-            onTap: () {
-              Navigator.pushNamed(context, '/add_address');
-            },
-          ),
-
-          ListTile(
-            leading: const Icon(Icons.lock_outline),
-            title: const Text("Change Password"),
-            onTap: () {
-              Navigator.pushNamed(context, '/password_reset');
-            },
-          ),
-
-          ListTile(
-            leading: const Icon(Icons.settings_outlined),
-            title: const Text("Settings"),
-            onTap: () {},
-          ),
-
-          ListTile(
-            leading: const Icon(Icons.support_agent),
-            title: const Text("Contact Us"),
-            onTap: () {
-              Navigator.pushNamed(context, '/contact_us');
-            },
-          ),
-
-          const Divider(),
-          const SizedBox(height: 10),
-
-          ListTile(
-            leading: const Icon(Icons.logout, color: Colors.red),
-            title: const Text("Logout", style: TextStyle(color: Colors.red)),
-            onTap: () {
-              // Show confirmation dialog
-              showDialog(
-                context: context,
-                builder: (dialogContext) => AlertDialog(
-                  title: const Text('Logout'),
-                  content: const Text('Are you sure you want to logout?'),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(dialogContext),
-                      child: const Text('Cancel'),
-                    ),
-                    ElevatedButton(
-                      onPressed: () async {
-                        Navigator.pop(dialogContext);
-                        // Clear auth data
-                        await AuthService.clearAuth();
-                        if (!context.mounted) return;
-                        Navigator.pushReplacementNamed(context, '/login');
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Logged out successfully'),
-                            duration: Duration(seconds: 1),
-                          ),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red,
-                      ),
-                      child: const Text(
-                        'Logout',
-                        style: TextStyle(color: Color.fromARGB(255, 241, 238, 238)),
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            },
-          ),
-        ],
-      ),
     );
   }
 }
