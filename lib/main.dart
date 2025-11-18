@@ -8,6 +8,8 @@ import './login_page.dart';
 import 'signup_page.dart';
 import 'package:demo_app/pages/add_addres.dart';
 import 'package:demo_app/pages/order_history.dart';
+import 'package:demo_app/pages/forgot_password.dart';
+import 'package:demo_app/pages/reset_password_new.dart';
 
 void main() {
   runApp(const MyApp());
@@ -38,13 +40,16 @@ class _MyAppState extends State<MyApp> {
         colorScheme: const ColorScheme.dark(
           primary: Colors.orange,
           secondary: Colors.deepOrangeAccent,
-          surface: Color.fromARGB(255, 146, 142, 142),
-          background: Color(0xFF121212),
-          onPrimary: Colors.white,
-          onSecondary: Colors.white,
-          onSurface: Colors.white70,
-          onBackground: Colors.white70,
+          surface: Color(0xFF1E1E1E),
+          onPrimary: Colors.black,
+          onSecondary: Colors.black,
+          onSurface: Colors.white,
+          primaryContainer: Color(0xFF2C2C2C),
+          onPrimaryContainer: Colors.white,
+          surfaceContainerHighest: Color(0xFF2C2C2C),
         ),
+        scaffoldBackgroundColor: const Color(0xFF121212),
+        cardColor: const Color(0xFF1E1E1E),
         useMaterial3: true,
       )
     : ThemeData(
@@ -53,12 +58,15 @@ class _MyAppState extends State<MyApp> {
           primary: Colors.orange,
           secondary: Colors.deepOrangeAccent,
           surface: Colors.white,
-          background: Color(0xFFF7F7F7),
           onPrimary: Colors.white,
           onSecondary: Colors.white,
           onSurface: Colors.black87,
-          onBackground: Colors.black87,
+          primaryContainer: Color(0xFFFFE0B2),
+          onPrimaryContainer: Colors.black87,
+          surfaceContainerHighest: Color(0xFFF5F5F5),
         ),
+        scaffoldBackgroundColor: const Color(0xFFF7F7F7),
+        cardColor: Colors.white,
         useMaterial3: true,
       ),
 
@@ -89,6 +97,20 @@ class _MyAppState extends State<MyApp> {
         '/add-address': (context) => const AddAddressPage(),
         '/password_reset': (context) => PasswordResetPage(),
         '/order-history': (context) => const OrderHistoryPage(),
+        '/forgot-password': (context) => const ForgotPasswordPage(),
+      },
+      onGenerateRoute: (settings) {
+        if (settings.name == '/reset-password-new') {
+          final args = settings.arguments as Map<String, dynamic>;
+          return MaterialPageRoute(
+            builder: (context) => ResetPasswordNewPage(
+              mobileNumber: args['mobile_no']!,
+              otp: args['otp']!,
+              token: args['token'],
+            ),
+          );
+        }
+        return null;
       },
 
 

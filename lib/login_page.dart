@@ -70,6 +70,12 @@ class _MyLoginState extends State<MyLogin> {
                      userData?['access_token'];
         
         if (token != null) {
+          // Print Bearer token
+          print('==========================================');
+          print('Bearer Token: $token');
+          print('Authorization Header: Bearer $token');
+          print('==========================================');
+          
           // Save authentication data
           await AuthService.saveLoginResponse(
             token: token,
@@ -319,13 +325,7 @@ class _MyLoginState extends State<MyLogin> {
                                 ),
                                 TextButton(
                                   onPressed: () {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content:
-                                            const Text('Feature coming soon'),
-                                        backgroundColor: colorScheme.primary,
-                                      ),
-                                    );
+                                    Navigator.pushNamed(context, '/forgot-password');
                                   },
                                   child: Text(
                                     'Forgot Password?',

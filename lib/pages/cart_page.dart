@@ -84,7 +84,9 @@ class _CartPageState extends State<CartPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('My Cart')),
+      appBar: AppBar(title: const Text('My Cart',
+      style: TextStyle(fontWeight: FontWeight.bold)
+      ,), centerTitle: true,  ),
       body: ValueListenableBuilder<List<CartItem>>(
         valueListenable: cartNotifier,
         builder: (context, list, _) {

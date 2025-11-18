@@ -24,9 +24,10 @@ class _ProductPageState extends State<ProductPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Products'),
-        backgroundColor: theme.colorScheme.primaryContainer,
-        centerTitle: true,
+        title: const Text('Products',
+         style: TextStyle(fontWeight: FontWeight.bold),),
+      centerTitle: true,
+        // backgroundColor: theme.colorScheme.primaryContainer,
       ),
       body: Column(
         children: [
