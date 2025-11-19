@@ -80,7 +80,7 @@ class _AddAddressPageState extends State<AddAddressPage> {
                 'id': address['id'],
                 'delivery_area': address['delivery_area'] ?? '',
                 'complete_address': address['complete_address'] ?? '',
-                'contact_no': address['contact_no'] ?? '',
+                'contact_no'   : address['contact_no'] ?? '',
                 'delivery_instructions': address['delivery_instructions'] ?? '',
                 'latitude': address['latitude'] ?? '',
                 'longitude': address['longitude'] ?? '',

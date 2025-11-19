@@ -3,6 +3,7 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'services/auth_service.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfilePage extends StatefulWidget {
   final ThemeMode themeMode;
@@ -37,6 +38,17 @@ class _ProfilePageState extends State<ProfilePage> {
   void initState() {
     super.initState();
     _loadUserData();
+    _loadProfileImage();
+  }
+
+  Future<void> _loadProfileImage() async {
+    final prefs = await SharedPreferences.getInstance();
+    final savedImagePath = prefs.getString('profile_image_path');
+    if (savedImagePath != null && File(savedImagePath).existsSync()) {
+      setState(() {
+        _profileImage = savedImagePath;
+      });
+    }
   }
 
   Future<void> _loadUserData() async {
@@ -117,10 +129,42 @@ class _ProfilePageState extends State<ProfilePage> {
   // ----------------------------------
   Future<void> _pickProfileImage() async {
     final ImagePicker picker = ImagePicker();
-    final XFile? picked = await picker.pickImage(source: ImageSource.gallery);
+    
+    // Show dialog to choose between gallery and camera
+    final source = await showDialog<ImageSource>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Choose Image Source'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.photo_library),
+              title: const Text('Gallery'),
+              onTap: () => Navigator.pop(context, ImageSource.gallery),
+            ),
+            ListTile(
+              leading: const Icon(Icons.camera_alt),
+              title: const Text('Camera'),
+              onTap: () => Navigator.pop(context, ImageSource.camera),
+            ),
+          ],
+        ),
+      ),
+    );
 
-    if (picked != null) {
-      setState(() => _profileImage = picked.path);
+    if (source != null) {
+      final XFile? picked = await picker.pickImage(source: source);
+
+      if (picked != null) {
+        // Save the image path to SharedPreferences
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('profile_image_path', picked.path);
+        
+        setState(() {
+          _profileImage = picked.path;
+        });
+      }
     }
   }
 

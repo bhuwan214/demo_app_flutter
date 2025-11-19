@@ -273,18 +273,30 @@ class PopularProduct extends StatefulWidget {
   State<PopularProduct> createState() => _PopularProductState();
 }
 
-class _PopularProductState extends State<PopularProduct> {
+class _PopularProductState extends State<PopularProduct> with AutomaticKeepAliveClientMixin {
   bool showAll = false;
   List<dynamic> items = [];
-  bool isLoading = true;
+  bool isLoading = false;
+  bool _hasFetched = false;
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {
     super.initState();
-    _fetchPopular();
+    if (!_hasFetched) {
+      _fetchPopular();
+    }
   }
 
   Future<void> _fetchPopular() async {
+    if (_hasFetched) return;
+    
+    setState(() {
+      isLoading = true;
+    });
+    
     try {
       final resp = await http.get(
         Uri.parse('https://ecommerce.atithyahms.com/api/ecommerce/products/popular'),
@@ -295,16 +307,37 @@ class _PopularProductState extends State<PopularProduct> {
           setState(() {
             items = data['data'];
             isLoading = false;
+            _hasFetched = true;
+          });
+        } else {
+          if (mounted) {
+            setState(() {
+              isLoading = false;
+              _hasFetched = true;
+            });
+          }
+        }
+      } else {
+        if (mounted) {
+          setState(() {
+            isLoading = false;
+            _hasFetched = true;
           });
         }
       }
     } catch (e) {
-      if (mounted) setState(() => isLoading = false);
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+          _hasFetched = true;
+        });
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     final colorScheme = Theme.of(context).colorScheme;
     
     final displayItems = showAll ? items : (items.length > 4 ? items.sublist(0, 4) : items);

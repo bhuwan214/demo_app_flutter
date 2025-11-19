@@ -22,7 +22,8 @@ class ProductGrid extends StatefulWidget {
 class _ProductGridState extends State<ProductGrid> with AutomaticKeepAliveClientMixin {
   List<dynamic> allItems = [];
   List<dynamic> filteredItems = [];
-  bool isLoading = true;
+  bool isLoading = false;
+  bool _hasFetched = false;
 
   @override
   bool get wantKeepAlive => true;
@@ -30,7 +31,9 @@ class _ProductGridState extends State<ProductGrid> with AutomaticKeepAliveClient
   @override
   void initState() {
     super.initState();
-    _fetchProducts();
+    if (!_hasFetched) {
+      _fetchProducts();
+    }
     widget.searchController?.addListener(_filterProducts);
   }
 
@@ -53,6 +56,12 @@ class _ProductGridState extends State<ProductGrid> with AutomaticKeepAliveClient
   }
 
   Future<void> _fetchProducts() async {
+    if (_hasFetched) return;
+    
+    setState(() {
+      isLoading = true;
+    });
+    
     try {
       final response = await http.get(Uri.parse(widget.apiUrl));
 
@@ -63,12 +72,30 @@ class _ProductGridState extends State<ProductGrid> with AutomaticKeepAliveClient
             allItems = data['data'];
             filteredItems = allItems;
             isLoading = false;
+            _hasFetched = true;
+          });
+        } else {
+          if (mounted) {
+            setState(() {
+              isLoading = false;
+              _hasFetched = true;
+            });
+          }
+        }
+      } else {
+        if (mounted) {
+          setState(() {
+            isLoading = false;
+            _hasFetched = true;
           });
         }
       }
     } catch (e) {
       if (mounted) {
-        setState(() => isLoading = false);
+        setState(() {
+          isLoading = false;
+          _hasFetched = true;
+        });
       }
       debugPrint("Error: $e");
     }
