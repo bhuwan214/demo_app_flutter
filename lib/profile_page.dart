@@ -71,11 +71,9 @@ class _ProfilePageState extends State<ProfilePage> {
     setState(() => _isLoading = false);
   }
 
-  // -------------------------------
-  // UPDATE PROFILE API CALL
-  // -------------------------------
+
   Future<void> updateProfile() async {
-    Navigator.pop(context); // Close popup
+    Navigator.pop(context); 
 
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text("Saving..."), duration: Duration(seconds: 1)),
@@ -124,9 +122,7 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
-  // ----------------------------------
-  // IMAGE PICKER
-  // ----------------------------------
+
   Future<void> _pickProfileImage() async {
     final ImagePicker picker = ImagePicker();
     

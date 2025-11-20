@@ -12,7 +12,7 @@ class ImagePickerService {
     try {
       final XFile? pickedFile = await _picker.pickImage(
         source: ImageSource.gallery,
-        imageQuality: 85, // Compress image to 85% quality
+        imageQuality: 85,
         maxWidth: 1080,
         maxHeight: 1080,
       );
@@ -34,13 +34,12 @@ class ImagePickerService {
     try {
       final XFile? pickedFile = await _picker.pickImage(
         source: ImageSource.camera,
-        imageQuality: 85, // Compress image to 85% quality
+        imageQuality: 85, 
         maxWidth: 1080,
         maxHeight: 1080,
       );
 
       if (pickedFile != null) {
-        // Save to app directory
         final savedPath = await _saveImageToAssets(pickedFile.path);
         return savedPath;
       }

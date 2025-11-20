@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'dart:io';
 import '../grid.dart';
 import 'package:demo_app/widget/search_field.dart';
 import '../services/auth_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeBody extends StatefulWidget {
   const HomeBody({super.key});
@@ -16,11 +18,23 @@ class _HomeBodyState extends State<HomeBody> {
   final TextEditingController _searchController = TextEditingController();
   String _userName = 'Guest';
   bool _isLoadingUser = true;
+  String? _profileImagePath;
 
   @override
   void initState() {
     super.initState();
     _loadUserData();
+    _loadProfileImage();
+  }
+
+  Future<void> _loadProfileImage() async {
+    final prefs = await SharedPreferences.getInstance();
+    final savedImagePath = prefs.getString('profile_image_path');
+    if (savedImagePath != null && File(savedImagePath).existsSync() && mounted) {
+      setState(() {
+        _profileImagePath = savedImagePath;
+      });
+    }
   }
 
   Future<void> _loadUserData() async {
@@ -92,7 +106,12 @@ class _HomeBodyState extends State<HomeBody> {
                       CircleAvatar(
                         radius: 25,
                         backgroundColor: colorScheme.primary,
-                        child: Icon(Icons.person, color: colorScheme.onPrimary),
+                        backgroundImage: _profileImagePath != null
+                            ? FileImage(File(_profileImagePath!))
+                            : null,
+                        child: _profileImagePath == null
+                            ? Icon(Icons.person, color: colorScheme.onPrimary)
+                            : null,
                       ),
                       const SizedBox(width: 12),
                       _isLoadingUser

@@ -241,6 +241,8 @@ class ItemCard extends StatelessWidget {
                   color: Colors.green,
                   fontWeight: FontWeight.w700,
                 ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ],
           ),

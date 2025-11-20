@@ -71,11 +71,7 @@ class _MyLoginState extends State<MyLogin> {
                      userData?['access_token'];
         
         if (token != null) {
-          // Print Bearer token
-          print('==========================================');
-          print('Bearer Token: $token');
-          print('Authorization Header: Bearer $token');
-          print('==========================================');
+
           
           // Save authentication data
           await AuthService.saveLoginResponse(
