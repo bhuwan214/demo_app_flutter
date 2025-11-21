@@ -22,3 +22,11 @@ samples, guidance on mobile development, and a full API reference.
 3. For iOS, download `GoogleService-Info.plist` from Firebase and add it to `ios/Runner`. Then rerun `flutterfire configure` so iOS options are emitted; Xcode also needs the Firebase CocoaPods (`pod install`).
 4. The app calls `Firebase.initializeApp` at startup and uses `firebase_auth` + `google_sign_in` to obtain a Google identity, then it exchanges the profile with your backend (`/api/v2/ecommerce/customer/google/login`) to receive the API token saved via `AuthService`.
 5. To test locally: `flutter run --flavor development` (or just `flutter run`). On first login, pick the Google account, approve the consent screen, and confirm that you are navigated to `/home`. Use `flutter logs` to inspect Firebase/HTTP output if something goes wrong.
+
+## Push Notifications (FCM)
+
+1. Dependencies: `firebase_messaging` is declared in `pubspec.yaml` and Android pulls `com.google.firebase:firebase-messaging` via the Gradle BoM. Run `flutter pub get` after any change.
+2. Android: `android/app/google-services.json` must match the applicationId (`com.example.demo_app`). The manifest now includes `POST_NOTIFICATIONS`; on Android 13+ the user still must grant the runtime permission.
+3. App startup: `lib/main.dart` registers `firebaseMessagingBackgroundHandler` and calls `FcmService.initialize()` before `runApp` so FCM works in foreground, background, and terminated states.
+4. Runtime behavior is implemented in `lib/services/fcm_service.dart`: it requests notification permission, logs/refreshes tokens, and wires listeners for `FirebaseMessaging.onMessage` and `onMessageOpenedApp`. Extend `_persistToken` to POST the device token to your backend when you are ready to send targeted pushes.
+5. Testing: use the Firebase console → Cloud Messaging → "Send test message". Enter the FCM token printed in the run logs. Keep the app running (foreground to verify in-app handler logs, background/terminated to verify system notifications).
