@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../services/auth_service.dart';
+import '../services/notification_service.dart';
 import 'cart_page.dart';
 
 class CheckoutPage extends StatefulWidget {
@@ -179,6 +180,17 @@ class _CheckoutPageState extends State<CheckoutPage> {
               .where((item) => !widget.cartItems.contains(item))
               .toList();
           cartNotifier.value = remainingItems;
+
+          final dynamic orderPayload = data['data'] ?? data['order'];
+          final String? orderId = (data['order_id'] ??
+                  orderPayload?['order_id'] ??
+                  orderPayload?['id'])
+              ?.toString();
+
+          await NotificationService.showOrderPlacedNotification(
+            amount: widget.totalAmount,
+            orderId: orderId,
+          );
 
           // Show success dialog
           showDialog(

@@ -14,6 +14,7 @@ import 'package:demo_app/pages/forgot_password.dart';
 import 'package:demo_app/pages/reset_password_new.dart';
 import 'firebase_options.dart';
 import 'services/fcm_service.dart';
+import 'services/notification_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -22,6 +23,7 @@ Future<void> main() async {
   );
   FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
   await FcmService.initialize();
+  await NotificationService.initialize();
   runApp(const MyApp());
 }
 
