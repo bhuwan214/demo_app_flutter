@@ -79,14 +79,16 @@ class _CartPageState extends State<CartPage> {
     return total;
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('My Cart',
-      style: TextStyle(fontWeight: FontWeight.bold)
-      ,), centerTitle: true,  ),
+      appBar: AppBar(
+        title: const Text(
+          'My Cart',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        centerTitle: true,
+      ),
       body: ValueListenableBuilder<List<CartItem>>(
         valueListenable: cartNotifier,
         builder: (context, list, _) {
@@ -151,82 +153,64 @@ class _CartPageState extends State<CartPage> {
                               fontWeight: FontWeight.w500,
                               fontSize: 14,
                             ),
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis, // Add this
+                            maxLines: 2, // Add this
                           ),
                           subtitle: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              IntrinsicWidth(
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Text(
-                                      'Rs ${item.price}',
-                                      style: const TextStyle(
-                                      
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.green,
-                                      ),
+                              Row(
+                                mainAxisSize:
+                                    MainAxisSize.min, // Keep this as min
+                                children: [
+                                  Text(
+                                    'Rs ${item.price}',
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.green,
                                     ),
-                                    const SizedBox(width: 8),
-                                    IconButton(
-                                      padding: EdgeInsets.zero,
-                                      constraints: const BoxConstraints.tightFor(
-                                        width: 20,
-                                        height: 20,
-                                    
-                                      ),
-                                      iconSize: 16,
-                                      splashRadius: 30,
-                                      
-                                      icon: const Icon(Icons.remove),
-                                      onPressed: () {
-                                        if (item.quantity > 1) {
-                                          item.quantity--;
-                                          cartNotifier.value = List<CartItem>.from(
-                                            cartNotifier.value,
-                                          );
-                                        }
-                                      },
-                                    ),
-                                    Container(
-                                      width: 20,
+                                  ),
+                                  const SizedBox(width: 4), // Reduced from 8
+                                  IconButton(
+                                    padding: EdgeInsets.zero,
+                                    constraints: const BoxConstraints.tightFor(
+                                      width: 15,
                                       height: 20,
-                                      decoration: BoxDecoration(
-                                        color: Colors.yellow,
-                                        borderRadius: BorderRadius.circular(4),
-                                      ),
-                                      child: Center(
-                                        child: Text(
-                                          item.quantity.toString(),
-                                          style: const TextStyle(
-                                            fontSize: 12,
-                                            color: Colors.black,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                          maxLines: 1,
-                                        ),
-                                      ),
                                     ),
-                                    IconButton(
-                                      padding: EdgeInsets.zero,
-                                      constraints: const BoxConstraints.tightFor(
-                                        width: 15,
-                                        height: 20,
-                                      ),
-                                      iconSize: 16,
-                                      splashRadius: 16,
-                                      icon: const Icon(Icons.add),
-                                      onPressed: () {
-                                        item.quantity++;
-                                        cartNotifier.value = List<CartItem>.from(
-                                          cartNotifier.value,
-                                        );
-                                      },
+                                    iconSize: 16,
+                                    splashRadius: 16,
+                                    icon: const Icon(Icons.remove),
+                                    onPressed: () {
+                                      if (item.quantity > 1) {
+                                        item.quantity--;
+                                        cartNotifier.value =
+                                            List<CartItem>.from(
+                                              cartNotifier.value,
+                                            );
+                                      }
+                                    },
+                                  ),
+                                  Text(
+                                    item.quantity.toString(),
+                                    style: const TextStyle(fontSize: 14),
+                                  ),
+                                  IconButton(
+                                    padding: EdgeInsets.zero,
+                                    constraints: const BoxConstraints.tightFor(
+                                      width: 15,
+                                      height: 20,
                                     ),
-                                  ],
-                                ),
+                                    iconSize: 16,
+                                    splashRadius: 16,
+                                    icon: const Icon(Icons.add),
+                                    onPressed: () {
+                                      item.quantity++;
+                                      cartNotifier.value = List<CartItem>.from(
+                                        cartNotifier.value,
+                                      );
+                                    },
+                                  ),
+                                ],
                               ),
                             ],
                           ),
@@ -237,17 +221,7 @@ class _CartPageState extends State<CartPage> {
                             color: Colors.red,
                             onPressed: () => removeCartItem(item),
                           ),
-                          onTap: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (_) =>DetailsPage(
-              imageUrl: item.imageUrl,
-              name: item.name,
-              price: item.price.toString(),
-            ),
-                              ),
-                            );
-                          },
+                          // ... rest of the code
                         ),
                       ),
                     );

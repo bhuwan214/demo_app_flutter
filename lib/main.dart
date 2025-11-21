@@ -1,4 +1,5 @@
 import 'package:demo_app/pages/password_reset.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'home.dart';
 // import'buttonbar.dart';
@@ -10,8 +11,13 @@ import 'package:demo_app/pages/add_addres.dart';
 import 'package:demo_app/pages/order_history.dart';
 import 'package:demo_app/pages/forgot_password.dart';
 import 'package:demo_app/pages/reset_password_new.dart';
+import 'firebase_options.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(const MyApp());
 }
 

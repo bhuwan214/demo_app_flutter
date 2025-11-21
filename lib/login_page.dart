@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'services/auth_service.dart';
+import 'services/google_sign_in_service.dart';
 
 class MyLogin extends StatefulWidget {
   final ThemeMode themeMode;
@@ -23,6 +24,36 @@ class _MyLoginState extends State<MyLogin> {
   final TextEditingController _passwordController = TextEditingController();
   bool _isLoading = false;
   bool _obscurePassword = true;
+
+  // 🔐 GOOGLE SIGN IN FUNCTION
+  Future<void> _signInWithGoogle() async {
+    setState(() => _isLoading = true);
+
+    final result = await GoogleSignInService.signInWithGoogle();
+    
+    if (!mounted) return;
+    
+    if (result.success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(result.message),
+          backgroundColor: Colors.green,
+        ),
+      );
+      Navigator.pushReplacementNamed(context, '/home');
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(result.message),
+          backgroundColor: result.message.contains('canceled') 
+              ? Colors.orange 
+              : Colors.red,
+        ),
+      );
+    }
+    
+    setState(() => _isLoading = false);
+  }
 
   // 🧠 LOGIN FUNCTION
   Future<void> _loginUser() async {
@@ -312,6 +343,88 @@ class _MyLoginState extends State<MyLogin> {
                                           ),
                                         ],
                                       ),
+                              ),
+                            ),
+                            const SizedBox(height: 20),
+
+                            // Separator with "OR"
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Divider(
+                                    color: colorScheme.onSurface.withOpacity(0.3),
+                                    thickness: 1,
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                                  child: Text(
+                                    'OR',
+                                    style: TextStyle(
+                                      color: colorScheme.onSurface.withOpacity(0.6),
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                ),
+                                Expanded(
+                                  child: Divider(
+                                    color: colorScheme.onSurface.withOpacity(0.3),
+                                    thickness: 1,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 20),
+
+                            // Google Sign In Button
+                            SizedBox(
+                              width: double.infinity,
+                              height: 56,
+                              child: OutlinedButton(
+                                onPressed: _isLoading ? null : _signInWithGoogle,
+                                style: OutlinedButton.styleFrom(
+                                  side: BorderSide(
+                                    color: colorScheme.outline.withOpacity(0.5),
+                                    width: 1.5,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  backgroundColor: colorScheme.surface,
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Container(
+                                      width: 24,
+                                      height: 24,
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: Colors.white,
+                                      ),
+                                      child: Center(
+                                        child: Text(
+                                          'G',
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.blue[700],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Text(
+                                      'Continue with Google',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                        color: colorScheme.onSurface,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                             const SizedBox(height: 20),
