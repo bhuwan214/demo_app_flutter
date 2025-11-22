@@ -40,40 +40,70 @@ class NotificationService {
         ?.createNotificationChannel(_orderChannel);
   }
 
+  static NotificationDetails _defaultDetails() => NotificationDetails(
+        android: AndroidNotificationDetails(
+          _orderChannel.id,
+          _orderChannel.name,
+          channelDescription: _orderChannel.description,
+          importance: Importance.high,
+          priority: Priority.high,
+          icon: '@mipmap/ic_launcher',
+        ),
+        iOS: const DarwinNotificationDetails(
+          presentAlert: true,
+          presentBadge: true,
+          presentSound: true,
+        ),
+        macOS: const DarwinNotificationDetails(
+          presentAlert: true,
+          presentBadge: true,
+          presentSound: true,
+        ),
+      );
+
+  static Future<void> showSimpleNotification({
+    required String title,
+    required String body,
+    String? payload,
+  }) async {
+    await _showNotification(
+      title: title,
+      body: body,
+      payload: payload,
+    );
+  }
+
   static Future<void> showOrderPlacedNotification({
     required double amount,
     String? orderId,
   }) async {
-    final int notificationId =
-        DateTime.now().millisecondsSinceEpoch.remainder(1 << 31);
-
     final String title = orderId == null
         ? 'Order placed successfully'
         : 'Order #$orderId placed';
     final String body =
         'We\'re processing your order totalling Rs ${amount.toStringAsFixed(2)}.';
 
-    final NotificationDetails details = NotificationDetails(
-      android: AndroidNotificationDetails(
-        _orderChannel.id,
-        _orderChannel.name,
-        channelDescription: _orderChannel.description,
-        importance: Importance.high,
-        priority: Priority.high,
-        icon: '@mipmap/ic_launcher',
-      ),
-      iOS: const DarwinNotificationDetails(
-        presentAlert: true,
-        presentBadge: true,
-        presentSound: true,
-      ),
-      macOS: const DarwinNotificationDetails(
-        presentAlert: true,
-        presentBadge: true,
-        presentSound: true,
-      ),
-    );
+    await _showNotification(title: title, body: body);
+  }
 
-    await _plugin.show(notificationId, title, body, details);
+  static Future<void> _showNotification({
+    required String title,
+    required String body,
+    String? payload,
+  }) async {
+    if (title.isEmpty && body.isEmpty) {
+      return;
+    }
+
+    final int notificationId =
+        DateTime.now().millisecondsSinceEpoch.remainder(1 << 31);
+
+    await _plugin.show(
+      notificationId,
+      title.isEmpty ? 'Notification' : title,
+      body,
+      _defaultDetails(),
+      payload: payload,
+    );
   }
 }

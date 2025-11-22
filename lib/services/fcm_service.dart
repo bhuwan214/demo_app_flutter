@@ -3,6 +3,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 
 import '../firebase_options.dart';
+import 'notification_service.dart';
 
 /// Handles Firebase Cloud Messaging registration and message streams.
 class FcmService {
@@ -23,7 +24,9 @@ class FcmService {
       _handleMessageOpenedApp(initialMessage);
     }
 
-    FirebaseMessaging.onMessage.listen(_handleForegroundMessage);
+    FirebaseMessaging.onMessage.listen(
+      (RemoteMessage message) async => _handleForegroundMessage(message),
+    );
     FirebaseMessaging.onMessageOpenedApp.listen(_handleMessageOpenedApp);
     _messaging.onTokenRefresh.listen(_persistToken);
   }
@@ -73,11 +76,24 @@ class FcmService {
     // TODO: Send token to your backend if device level targeting is required.
   }
 
-  static void _handleForegroundMessage(RemoteMessage message) {
+  static Future<void> _handleForegroundMessage(RemoteMessage message) async {
     debugPrint('📨 Foreground message: ${message.messageId}');
     if (message.notification != null) {
       debugPrint('   Title: ${message.notification?.title}');
       debugPrint('   Body : ${message.notification?.body}');
+    }
+
+    final String? title =
+        message.notification?.title ?? message.data['title']?.toString();
+    final String? body =
+        message.notification?.body ?? message.data['body']?.toString();
+
+    if (title != null || body != null) {
+      await NotificationService.showSimpleNotification(
+        title: title ?? 'New notification',
+        body: body ?? '',
+        payload: message.data.isEmpty ? null : message.data.toString(),
+      );
     }
   }
 

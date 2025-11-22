@@ -22,8 +22,8 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
-  await FcmService.initialize();
   await NotificationService.initialize();
+  await FcmService.initialize();
   runApp(const MyApp());
 }
 
