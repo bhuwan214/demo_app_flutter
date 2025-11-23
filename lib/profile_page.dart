@@ -71,12 +71,14 @@ class _ProfilePageState extends State<ProfilePage> {
     setState(() => _isLoading = false);
   }
 
-
   Future<void> updateProfile() async {
-    Navigator.pop(context); 
+    Navigator.pop(context);
 
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Saving..."), duration: Duration(seconds: 1)),
+      const SnackBar(
+        content: Text("Saving..."),
+        duration: Duration(seconds: 1),
+      ),
     );
 
     final token = await AuthService.getToken();
@@ -122,10 +124,9 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
-
   Future<void> _pickProfileImage() async {
     final ImagePicker picker = ImagePicker();
-    
+
     // Show dialog to choose between gallery and camera
     final source = await showDialog<ImageSource>(
       context: context,
@@ -156,7 +157,7 @@ class _ProfilePageState extends State<ProfilePage> {
         // Save the image path to SharedPreferences
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('profile_image_path', picked.path);
-        
+
         setState(() {
           _profileImage = picked.path;
         });
@@ -164,15 +165,16 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
-
   void _openEditPopup() {
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text("Edit Profile",
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+          title: const Text(
+            "Edit Profile",
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          ),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -223,7 +225,6 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -231,7 +232,6 @@ class _ProfilePageState extends State<ProfilePage> {
 
     return SafeArea(
       child: Scaffold(
-      
         body: _isLoading
             ? const Center(child: CircularProgressIndicator())
             : ListView(
@@ -259,34 +259,41 @@ class _ProfilePageState extends State<ProfilePage> {
                                 backgroundColor: theme.colorScheme.primary,
                                 radius: 18,
                                 child: IconButton(
-                                  icon: const Icon(Icons.camera_alt,
-                                      color: Colors.white, size: 18),
+                                  icon: const Icon(
+                                    Icons.camera_alt,
+                                    color: Colors.white,
+                                    size: 18,
+                                  ),
                                   onPressed: _pickProfileImage,
                                   padding: EdgeInsets.zero,
                                 ),
                               ),
-                            )
+                            ),
                           ],
                         ),
                         const SizedBox(height: 12),
-      
+
                         Text(
-                          "$firstName $lastName".trim().isNotEmpty 
-                              ? "$firstName $lastName".trim() 
+                          "$firstName $lastName".trim().isNotEmpty
+                              ? "$firstName $lastName".trim()
                               : "User",
                           style: theme.textTheme.titleLarge?.copyWith(
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-      
+
                         if (phoneNumber.isNotEmpty)
-                          Text(phoneNumber,
-                              style: TextStyle(
-                                  color:
-                                      theme.colorScheme.onSurface.withOpacity(0.6))),
-      
+                          Text(
+                            phoneNumber,
+                            style: TextStyle(
+                              color: theme.colorScheme.onSurface.withOpacity(
+                                0.6,
+                              ),
+                            ),
+                          ),
+
                         const SizedBox(height: 14),
-      
+
                         ElevatedButton.icon(
                           onPressed: _openEditPopup,
                           icon: const Icon(Icons.edit),
@@ -295,65 +302,76 @@ class _ProfilePageState extends State<ProfilePage> {
                       ],
                     ),
                   ),
-      
+
                   const SizedBox(height: 20),
                   const Divider(),
                   const SizedBox(height: 10),
-      
+
                   // ------------------------------
                   // OLD LISTTILES RESTORED
                   // ------------------------------
-      
                   ListTile(
-                    leading: Icon(isDarkMode ? Icons.dark_mode : Icons.light_mode),
+                    leading: Icon(
+                      isDarkMode ? Icons.dark_mode : Icons.light_mode,
+                    ),
                     title: const Text("Theme"),
                     subtitle: Text(isDarkMode ? "Dark Mode" : "Light Mode"),
                     trailing: Switch.adaptive(
                       value: isDarkMode,
                       onChanged: (value) {
                         widget.onThemeChanged(
-                            value ? ThemeMode.dark : ThemeMode.light);
+                          value ? ThemeMode.dark : ThemeMode.light,
+                        );
                       },
                     ),
                   ),
-      
+
                   const Divider(),
-      
+
                   ListTile(
                     leading: const Icon(Icons.history_outlined),
                     title: const Text("Order History"),
                     onTap: () => Navigator.pushNamed(context, '/order-history'),
                   ),
-      
+
+                  ListTile(
+                    leading: const Icon(Icons.location_on_outlined),
+                    title: const Text("Delivery Addresses"),
+                    onTap: () => Navigator.pushNamed(context, '/addresses'),
+                  ),
+
                   ListTile(
                     leading: const Icon(Icons.add_location_alt_sharp),
                     title: const Text("Add Delivery Location"),
                     onTap: () => Navigator.pushNamed(context, '/add_address'),
                   ),
-      
+
                   ListTile(
                     leading: const Icon(Icons.lock_outline),
                     title: const Text("Change Password"),
-                    onTap: () => Navigator.pushNamed(context, '/password_reset'),
+                    onTap: () =>
+                        Navigator.pushNamed(context, '/password_reset'),
                   ),
-      
+
                   ListTile(
                     leading: const Icon(Icons.settings_outlined),
                     title: const Text("Settings"),
                   ),
-      
+
                   ListTile(
                     leading: const Icon(Icons.support_agent),
                     title: const Text("Contact Us"),
                     onTap: () => Navigator.pushNamed(context, '/contact_us'),
                   ),
-      
+
                   const Divider(),
-      
+
                   ListTile(
                     leading: const Icon(Icons.logout, color: Colors.red),
-                    title: const Text("Logout",
-                        style: TextStyle(color: Colors.red)),
+                    title: const Text(
+                      "Logout",
+                      style: TextStyle(color: Colors.red),
+                    ),
                     onTap: () async {
                       await AuthService.clearAuth();
                       if (!mounted) return;
