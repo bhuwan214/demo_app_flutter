@@ -109,119 +109,130 @@ class _CartPageState extends State<CartPage> {
                         horizontal: 10,
                         vertical: 10,
                       ),
-                      child: IntrinsicWidth(
-                        child: ListTile(
-                          leading: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Transform.scale(
-                                scale: 0.8,
-                                child: Checkbox(
-                                  value: item.isSelected,
-                                  onChanged: (value) {
-                                    item.isSelected = value!;
-                                    cartNotifier.value = List<CartItem>.from(
-                                      cartNotifier.value,
-                                    );
-                                  },
-                                ),
-                              ),
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(8),
-                                child: item.imageUrl.startsWith('http')
-                                    ? Image.network(
-                                        item.imageUrl,
-                                        width: 47,
-                                        height: 50,
-                                        fit: BoxFit.cover,
-                                        errorBuilder:
-                                            (context, error, stackTrace) =>
-                                                const Icon(Icons.broken_image),
-                                      )
-                                    : Image.asset(
-                                        item.imageUrl,
-                                        width: 48,
-                                        height: 48,
-                                        fit: BoxFit.cover,
-                                      ),
-                              ),
-                            ],
-                          ),
-                          title: Text(
-                            item.name,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w500,
-                              fontSize: 14,
-                            ),
-                            overflow: TextOverflow.ellipsis, // Add this
-                            maxLines: 2, // Add this
-                          ),
-                          subtitle: Column(
+                      child: Padding(
+                        padding: const EdgeInsets.all(12),
+                        child: IntrinsicWidth(
+                          child: Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Row(
-                                mainAxisSize:
-                                    MainAxisSize.min, // Keep this as min
+                              Column(
+                                mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Text(
-                                    'Rs ${item.price}',
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.green,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 4), // Reduced from 8
-                                  IconButton(
-                                    padding: EdgeInsets.zero,
-                                    constraints: const BoxConstraints.tightFor(
-                                      width: 15,
-                                      height: 20,
-                                    ),
-                                    iconSize: 16,
-                                    splashRadius: 16,
-                                    icon: const Icon(Icons.remove),
-                                    onPressed: () {
-                                      if (item.quantity > 1) {
-                                        item.quantity--;
+                                  Transform.scale(
+                                    scale: 0.9,
+                                    child: Checkbox(
+                                      value: item.isSelected,
+                                      onChanged: (value) {
+                                        item.isSelected = value ?? false;
                                         cartNotifier.value =
                                             List<CartItem>.from(
                                               cartNotifier.value,
                                             );
-                                      }
-                                    },
-                                  ),
-                                  Text(
-                                    item.quantity.toString(),
-                                    style: const TextStyle(fontSize: 14),
-                                  ),
-                                  IconButton(
-                                    padding: EdgeInsets.zero,
-                                    constraints: const BoxConstraints.tightFor(
-                                      width: 15,
-                                      height: 20,
+                                      },
                                     ),
-                                    iconSize: 16,
-                                    splashRadius: 16,
-                                    icon: const Icon(Icons.add),
-                                    onPressed: () {
-                                      item.quantity++;
-                                      cartNotifier.value = List<CartItem>.from(
-                                        cartNotifier.value,
-                                      );
-                                    },
+                                  ),
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(8),
+                                    child: item.imageUrl.startsWith('http')
+                                        ? Image.network(
+                                            item.imageUrl,
+                                            width: 56,
+                                            height: 56,
+                                            fit: BoxFit.cover,
+                                            errorBuilder:(context, error, stackTrace) =>
+                                                const Icon(Icons.broken_image),
+                                          )
+                                        : Image.asset(
+                                            item.imageUrl,
+                                            width: 56,
+                                            height: 56,
+                                            fit: BoxFit.cover,
+                                          ),
                                   ),
                                 ],
                               ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      item.name,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 14,
+                                      ),
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    const SizedBox(height: 6),
+                                    IntrinsicWidth(
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            'Rs ${item.price}',
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.green,
+                                            ),
+                                          ),
+                                          Row(
+                                            children: [
+                                              _QuantityButton(
+                                                icon: Icons.remove,
+                                                onPressed: () {
+                                                  if (item.quantity > 1) {
+                                                    item.quantity--;
+                                                    cartNotifier.value =
+                                                        List<CartItem>.from(
+                                                          cartNotifier.value,
+                                                        );
+                                                  }
+                                                },
+                                              ),
+                                              Padding(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                  horizontal: 8,
+                                                ),
+                                                child: Text(
+                                                  item.quantity.toString(),
+                                                  style: const TextStyle(
+                                                    fontSize: 14,
+                                                  ),
+                                                ),
+                                              ),
+                                              _QuantityButton(
+                                                icon: Icons.add,
+                                                onPressed: () {
+                                                  item.quantity++;
+                                                  cartNotifier.value =
+                                                      List<CartItem>.from(
+                                                        cartNotifier.value,
+                                                      );
+                                                },
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              IconButton(
+                                padding: EdgeInsets.zero,
+                                constraints: const BoxConstraints(),
+                                icon: const Icon(Icons.delete),
+                                color: Colors.red,
+                                onPressed: () => removeCartItem(item),
+                              ),
                             ],
                           ),
-                          trailing: IconButton(
-                            padding: EdgeInsets.zero,
-                            constraints: const BoxConstraints(),
-                            icon: const Icon(Icons.delete),
-                            color: Colors.red,
-                            onPressed: () => removeCartItem(item),
-                          ),
-                          // ... rest of the code
                         ),
                       ),
                     );
@@ -300,6 +311,31 @@ class _CartPageState extends State<CartPage> {
           );
         },
       ),
+    );
+  }
+}
+
+class _QuantityButton extends StatelessWidget {
+  final IconData icon;
+  final VoidCallback onPressed;
+
+  const _QuantityButton({
+    required this.icon,
+    required this.onPressed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      padding: EdgeInsets.zero,
+      constraints: const BoxConstraints.tightFor(
+        width: 28,
+        height: 28,
+      ),
+      iconSize: 18,
+      splashRadius: 18,
+      icon: Icon(icon),
+      onPressed: onPressed,
     );
   }
 }

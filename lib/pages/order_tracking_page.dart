@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import '../services/auth_service.dart';
+import '../core/services/auth_service.dart';
 
 class OrderTrackingPage extends StatefulWidget {
   final String orderId;

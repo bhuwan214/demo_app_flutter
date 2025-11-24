@@ -4,7 +4,7 @@ import 'dart:convert';
 import 'dart:io';
 import '../grid.dart';
 import 'package:demo_app/widget/search_field.dart';
-import '../services/auth_service.dart';
+import '../core/services/auth_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeBody extends StatefulWidget {

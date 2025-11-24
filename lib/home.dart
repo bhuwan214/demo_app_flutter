@@ -42,8 +42,10 @@ class _HomePageState extends State<HomePage> {
     ];
 
     return Scaffold(
-
-      body: pages[_selectedIndex],
+      body: IndexedStack(
+        index: _selectedIndex,
+        children: pages,
+      ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,

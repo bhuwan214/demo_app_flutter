@@ -193,10 +193,6 @@ class ItemCard extends StatelessWidget {
             name: name,
             price: price,
           )));
-          // ScaffoldMessenger.of(context).showSnackBar(
-
-          // SnackBar(content: Text('Clicked on $name')),
-          // );
         },
         borderRadius: BorderRadius.circular(12),
         child: Padding(

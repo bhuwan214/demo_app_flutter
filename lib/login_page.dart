@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'services/auth_service.dart';
-import 'services/google_sign_in_service.dart';
+import 'core/services/auth_service.dart';
+import 'core/services/google_sign_in_service.dart';
 
 class MyLogin extends StatefulWidget {
   final ThemeMode themeMode;
@@ -200,11 +200,11 @@ class _MyLoginState extends State<MyLogin> {
                         margin: const EdgeInsets.symmetric(horizontal: 35),
                         padding: const EdgeInsets.all(30),
                         decoration: BoxDecoration(
-                          color: colorScheme.surface.withOpacity(0.95),
+                          color: colorScheme.surface,
                           borderRadius: BorderRadius.circular(20),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.3),
+                              color: const Color.fromARGB(213, 0, 0, 0),
                               blurRadius: 20,
                               offset: const Offset(0, 10),
                             ),
@@ -223,7 +223,7 @@ class _MyLoginState extends State<MyLogin> {
                                 filled: true,
                                 hintText: 'Username or Email',
                                 hintStyle: TextStyle(
-                                  color: colorScheme.onSurface.withOpacity(0.5),
+                                  color: colorScheme.onSurface,
                                 ),
                                 prefixIcon: Icon(
                                   Icons.person_outline,
@@ -236,7 +236,7 @@ class _MyLoginState extends State<MyLogin> {
                                 enabledBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
                                   borderSide: BorderSide(
-                                    color: colorScheme.outline.withOpacity(0.2),
+                                    color: colorScheme.outline,
                                   ),
                                 ),
                                 focusedBorder: OutlineInputBorder(
@@ -262,7 +262,7 @@ class _MyLoginState extends State<MyLogin> {
                                 filled: true,
                                 hintText: 'Password',
                                 hintStyle: TextStyle(
-                                  color: colorScheme.onSurface.withOpacity(0.5),
+                                  color: colorScheme.onSurface,
                                 ),
                                 prefixIcon: Icon(
                                   Icons.lock_outline,
@@ -288,7 +288,7 @@ class _MyLoginState extends State<MyLogin> {
                                 enabledBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
                                   borderSide: BorderSide(
-                                    color: colorScheme.outline.withOpacity(0.2),
+                                    color: colorScheme.outline,
                                   ),
                                 ),
                                 focusedBorder: OutlineInputBorder(
@@ -352,7 +352,7 @@ class _MyLoginState extends State<MyLogin> {
                               children: [
                                 Expanded(
                                   child: Divider(
-                                    color: colorScheme.onSurface.withOpacity(0.3),
+                                    color: colorScheme.onSurface,
                                     thickness: 1,
                                   ),
                                 ),
@@ -361,7 +361,7 @@ class _MyLoginState extends State<MyLogin> {
                                   child: Text(
                                     'OR',
                                     style: TextStyle(
-                                      color: colorScheme.onSurface.withOpacity(0.6),
+                                      color: colorScheme.onSurface,
                                       fontWeight: FontWeight.w500,
                                       fontSize: 14,
                                     ),
@@ -369,7 +369,7 @@ class _MyLoginState extends State<MyLogin> {
                                 ),
                                 Expanded(
                                   child: Divider(
-                                    color: colorScheme.onSurface.withOpacity(0.3),
+                                    color: colorScheme.onSurface,
                                     thickness: 1,
                                   ),
                                 ),
@@ -385,7 +385,7 @@ class _MyLoginState extends State<MyLogin> {
                                 onPressed: _isLoading ? null : _signInWithGoogle,
                                 style: OutlinedButton.styleFrom(
                                   side: BorderSide(
-                                    color: colorScheme.outline.withOpacity(0.5),
+                                    color: colorScheme.outline,
                                     width: 1.5,
                                   ),
                                   shape: RoundedRectangleBorder(
@@ -505,7 +505,7 @@ class topbar extends StatelessWidget {
               shadows: [
                 Shadow(
                   blurRadius: 10.0,
-                  color: Colors.black.withOpacity(0.5),
+                  color: Colors.black,
                   offset: const Offset(2.0, 2.0),
                 ),
               ],
@@ -514,11 +514,11 @@ class topbar extends StatelessWidget {
           // Theme Toggle Button
           Container(
             decoration: BoxDecoration(
-              color: colorScheme.surface.withOpacity(0.9),
+              color: colorScheme.surface,
               borderRadius: BorderRadius.circular(12),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.2),
+                  color: Colors.black,
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
